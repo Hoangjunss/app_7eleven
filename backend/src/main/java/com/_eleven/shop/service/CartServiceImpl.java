@@ -30,7 +30,7 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     public CartServiceImpl(RedisTemplate<String, Object> redisTemplate,
-                           ProductRepository productRepository) {
+            ProductRepository productRepository) {
         this.redisTemplate = redisTemplate;
         this.productRepository = productRepository;
         this.hashOps = redisTemplate.opsForHash();
@@ -99,7 +99,7 @@ public class CartServiceImpl implements CartService {
                     .productId(productId)
                     .productName(product.getName())
                     .price(product.getPrice())
-                    .thumbnailUrl(product.getImages().isEmpty() ? null : product.getImages().get(0).getUrl())
+                    .thumbnailUrl(product.getImages().isEmpty() ? null : product.getImages().get(0).getImageUrl())
                     .quantity(qty)
                     .subtotal(subtotal)
                     .build();
