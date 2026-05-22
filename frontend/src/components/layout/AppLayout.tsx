@@ -2,13 +2,14 @@
 
 /**
  * Global App Layout Shell.
- * Integrates Header and AdminSidebar, checks route pathnames,
- * and maintains SSR compatibility with a safe mount check.
+ * Integrates Header, AdminSidebar, and CartSync.
+ * Maintains SSR compatibility with a safe mount check.
  */
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import AdminSidebar from "./AdminSidebar";
+import CartSync from "@/components/CartSync";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -52,6 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <CartSync />
       <Header />
       <div className="flex-grow flex">
         {isAdminPage && isAuthenticated && role === "ADMIN" && <AdminSidebar />}
