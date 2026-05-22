@@ -28,11 +28,12 @@ public interface ProductMapper {
         if (product.getImages() == null || product.getImages().isEmpty()) {
             return null;
         }
-        return product.getImages().stream()
-                .filter(ProductImage::getIsPrimary)
-                .map(ProductImage::getImageUrl)
-                .findFirst()
-                .orElse(product.getImages().get(0).getImageUrl());
+        for (ProductImage image : product.getImages()) {
+            if (Boolean.TRUE.equals(image.getIsPrimary())) {
+                return image.getImageUrl();
+            }
+        }
+        return product.getImages().get(0).getImageUrl();
     }
 
     @Mapping(target = "id", ignore = true)

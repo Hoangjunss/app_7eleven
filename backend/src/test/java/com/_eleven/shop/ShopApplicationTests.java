@@ -30,6 +30,18 @@ class ShopApplicationTests {
 	@MockBean
 	private com._eleven.shop.repository.AuditLogRepository auditLogRepository;
 
+	@MockBean
+	private com._eleven.shop.repository.CategoryRepository categoryRepository;
+
+	@MockBean
+	private com._eleven.shop.repository.ProductRepository productRepository;
+
+	@MockBean
+	private com._eleven.shop.repository.ProductImageRepository productImageRepository;
+
+	@MockBean
+	private com._eleven.shop.service.CloudinaryStorageService cloudinaryStorageService;
+
 	@Test
 	void contextLoads() {
 	}

@@ -5,6 +5,6 @@ spring:
     active: dev
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dgts7tmnb}
+  api-key: ${CLOUDINARY_API_KEY:572933874577745}
+  api-secret: ${CLOUDINARY_API_SECRET:CgRjc0dmftxHE6F8m1k-SRwXEVo}
