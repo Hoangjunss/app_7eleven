@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse createProduct(ProductRequest request) {
+    public ProductResponse createProduct(ProductRequest request, MultipartFile[] images, Integer primaryImageIndex) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
@@ -41,6 +42,13 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
 
         product = productRepository.save(product);
+
+        if (images != null && images.length > 0) {
+            List<ProductImage> productImages = uploadAndAssociateImages(product, images, primaryImageIndex);
+            product.getImages().addAll(productImages);
+            product = productRepository.save(product);
+        }
+
         return productMapper.toResponse(product);
     }
 
@@ -113,6 +121,55 @@ public class ProductServiceImpl implements ProductService {
         };
 
         return productRepository.findAll(spec, pageable).map(productMapper::toResponse);
+    }
+
+    @Override
+    @Transactional
+    public ProductResponse uploadProductImages(Long productId, MultipartFile[] images, Integer primaryImageIndex) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (images != null && images.length > 0) {
+            List<ProductImage> productImages = uploadAndAssociateImages(product, images, primaryImageIndex);
+            product.getImages().addAll(productImages);
+            product = productRepository.save(product);
+        }
+
+        return productMapper.toResponse(product);
+    }
+
+    private List<ProductImage> uploadAndAssociateImages(Product product, MultipartFile[] images, Integer primaryImageIndex) {
+        List<ProductImage> productImages = new ArrayList<>();
+        if (images == null || images.length == 0) {
+            return productImages;
+        }
+
+        boolean hasExistingPrimary = product.getImages() != null &&
+                product.getImages().stream().anyMatch(ProductImage::getIsPrimary);
+
+        int primaryIndex = (primaryImageIndex != null && primaryImageIndex >= 0 && primaryImageIndex < images.length)
+                ? primaryImageIndex
+                : 0;
+
+        for (int i = 0; i < images.length; i++) {
+            MultipartFile file = images[i];
+            if (file.isEmpty()) {
+                continue;
+            }
+
+            String imageUrl = cloudinaryStorageService.uploadFile(file, "products");
+
+            boolean isPrimary = !hasExistingPrimary && (i == primaryIndex);
+
+            ProductImage productImage = ProductImage.builder()
+                    .product(product)
+                    .imageUrl(imageUrl)
+                    .isPrimary(isPrimary)
+                    .build();
+
+            productImages.add(productImage);
+        }
+        return productImages;
     }
 
     /**

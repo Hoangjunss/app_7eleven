@@ -11,7 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -22,11 +24,31 @@ public class AdminProductController {
 
     private final ProductService productService;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Auditable(action = "CREATE_PRODUCT", entityType = "PRODUCT")
-    public ApiResponse<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
-        ProductResponse response = productService.createProduct(request);
+    public ApiResponse<ProductResponse> createProductJson(@Valid @RequestBody ProductRequest request) {
+        ProductResponse response = productService.createProduct(request, null, null);
         return ApiResponse.success(response, "Product created successfully");
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Auditable(action = "CREATE_PRODUCT", entityType = "PRODUCT")
+    public ApiResponse<ProductResponse> createProductMultipart(
+            @RequestPart("product") @Valid ProductRequest request,
+            @RequestPart(value = "images", required = false) MultipartFile[] images,
+            @RequestParam(value = "primaryImageIndex", defaultValue = "0") Integer primaryImageIndex) {
+        ProductResponse response = productService.createProduct(request, images, primaryImageIndex);
+        return ApiResponse.success(response, "Product created successfully");
+    }
+
+    @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Auditable(action = "UPDATE_PRODUCT", entityType = "PRODUCT")
+    public ApiResponse<ProductResponse> uploadProductImages(
+            @PathVariable Long id,
+            @RequestPart("images") MultipartFile[] images,
+            @RequestParam(value = "primaryImageIndex", defaultValue = "0") Integer primaryImageIndex) {
+        ProductResponse response = productService.uploadProductImages(id, images, primaryImageIndex);
+        return ApiResponse.success(response, "Product images uploaded successfully");
     }
 
     @PutMapping("/{id}")
