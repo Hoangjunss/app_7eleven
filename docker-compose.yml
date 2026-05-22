@@ -1,0 +1,74 @@
+
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: shop-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: shop-redis
+    command: >
+      sh -c "
+      if [ -z \"${REDIS_PASSWORD}\" ]; then
+        redis-server
+      else
+        redis-server --requirepass \"${REDIS_PASSWORD}\"
+      fi
+      "
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: >
+        sh -c "
+        if [ -z \"${REDIS_PASSWORD}\" ]; then
+          redis-cli ping
+        else
+          redis-cli -a \"${REDIS_PASSWORD}\" ping
+        fi
+        "
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shop-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis-cache
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
