@@ -1,5 +1,6 @@
 package com._eleven.shop.controller;
 
+import com._eleven.shop.aspect.Auditable;
 import com._eleven.shop.dto.ApiResponse;
 import com._eleven.shop.dto.AuthResponse;
 import com._eleven.shop.dto.LoginRequest;
@@ -20,14 +21,24 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
+    @Auditable(action = "REGISTER", entityType = "USER")
     public ApiResponse<String> register(@Valid @RequestBody RegisterRequest request) {
         String message = authService.register(request);
         return ApiResponse.success(message, "User registered successfully");
     }
 
     @PostMapping("/login")
+    @Auditable(action = "LOGIN", entityType = "USER")
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ApiResponse.success(response, "Login successful");
     }
+
+    @PostMapping("/logout")
+    @Auditable(action = "LOGOUT", entityType = "USER")
+    public ApiResponse<String> logout() {
+        authService.logout();
+        return ApiResponse.success("Logged out successfully", "Logout successful");
+    }
 }
+

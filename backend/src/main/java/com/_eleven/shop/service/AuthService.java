@@ -72,4 +72,9 @@ public class AuthService {
                 .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                 .build();
     }
+
+    public void logout() {
+        SecurityContextHolder.clearContext();
+    }
 }
+
