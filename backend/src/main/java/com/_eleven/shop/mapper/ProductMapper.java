@@ -19,9 +19,21 @@ public interface ProductMapper {
 
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "primaryImageUrl", expression = "java(getPrimaryImageUrl(product))")
     ProductResponse toResponse(Product product);
 
     ProductImageResponse toImageResponse(ProductImage productImage);
+
+    default String getPrimaryImageUrl(Product product) {
+        if (product.getImages() == null || product.getImages().isEmpty()) {
+            return null;
+        }
+        return product.getImages().stream()
+                .filter(ProductImage::getIsPrimary)
+                .map(ProductImage::getImageUrl)
+                .findFirst()
+                .orElse(product.getImages().get(0).getImageUrl());
+    }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "category", ignore = true)
