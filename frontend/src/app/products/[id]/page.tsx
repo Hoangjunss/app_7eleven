@@ -4,11 +4,15 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useProductDetail } from "@/hooks/useProductDetail";
 import { formatCurrency } from "@/components/product/ProductCard";
+import { useCartStore } from "@/stores/cartStore";
+import { useAuthStore } from "@/stores/authStore";
+import { CART_QUERY_KEY } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ShoppingCart, Check, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ShoppingCart, Check, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface ProductDetailPageProps {
@@ -17,11 +21,15 @@ interface ProductDetailPageProps {
 
 export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { id } = React.use(params);
-  
+
   const { data, isLoading, isError, error, refetch } = useProductDetail(id);
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  const { isAuthenticated } = useAuthStore();
+  const { addItem, isLoading: cartLoading } = useCartStore();
 
   const product = data?.data;
 
@@ -95,9 +103,20 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const mainImage = activeImage || product.primaryImageUrl || (images[0]?.imageUrl) || "";
   const isOutOfStock = product.stockQuantity <= 0;
 
-  const handleAddToCart = () => {
-    toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng (Phase 3)`);
-    console.log("Add to cart:", { productId: product.id, quantity });
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast.error("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+      router.push("/login");
+      return;
+    }
+    try {
+      await addItem(product!.id, quantity, () =>
+        queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY })
+      );
+      toast.success(`Đã thêm "${product!.name}" vào giỏ hàng!`);
+    } catch {
+      toast.error("Không thể thêm sản phẩm. Vui lòng thử lại.");
+    }
   };
 
   return (
@@ -242,10 +261,15 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               <div className="flex gap-4 mt-2">
                 <Button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-[#0C5CAB] hover:bg-[#0a4a8a] text-white rounded-lg py-6 font-semibold flex items-center justify-center gap-2 shadow-md shadow-black/25 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#0C5CAB]"
+                  disabled={cartLoading}
+                  className="flex-1 bg-[#0C5CAB] hover:bg-[#0a4a8a] text-white rounded-lg py-6 font-semibold flex items-center justify-center gap-2 shadow-md shadow-black/25 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#0C5CAB] disabled:opacity-60"
                 >
-                  <ShoppingCart className="h-5 w-5" />
-                  Thêm vào giỏ hàng
+                  {cartLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <ShoppingCart className="h-5 w-5" />
+                  )}
+                  {cartLoading ? "Đang thêm..." : "Thêm vào giỏ hàng"}
                 </Button>
               </div>
             </div>
