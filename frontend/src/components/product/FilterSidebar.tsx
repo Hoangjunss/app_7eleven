@@ -120,7 +120,7 @@ export default function FilterSidebar({
         </Label>
         <Select
           value={categoryId || "all"}
-          onValueChange={(val) => onCategoryChange(val === "all" ? "" : val)}
+          onValueChange={(val) => onCategoryChange(val === "all" || !val ? "" : val)}
         >
           <SelectTrigger className="w-full bg-zinc-950/30 border-white/10 text-white rounded-lg h-9 cursor-pointer">
             <SelectValue placeholder="Tất cả danh mục" />
