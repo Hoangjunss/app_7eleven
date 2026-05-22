@@ -163,6 +163,62 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order with ID {} was cancelled by user {}", orderId, userId);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponse> getAllOrders(OrderStatus status, Long userId, Pageable pageable) {
+        Page<Order> orders;
+        if (userId != null && status != null) {
+            orders = orderRepository.findByUserIdAndStatus(userId, status, pageable);
+        } else if (userId != null) {
+            orders = orderRepository.findByUserId(userId, pageable);
+        } else if (status != null) {
+            orders = orderRepository.findByStatus(status, pageable);
+        } else {
+            orders = orderRepository.findAll(pageable);
+        }
+        return orders.map(this::mapToOrderResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        return mapToOrderResponse(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        OrderStatus currentStatus = order.getStatus();
+        if (!currentStatus.isValidTransitionTo(newStatus)) {
+            throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
+        }
+
+        order.setStatus(newStatus);
+
+        if (newStatus == OrderStatus.DELIVERED) {
+            order.setPaymentStatus(PaymentStatus.PAID);
+        } else if (newStatus == OrderStatus.CANCELLED) {
+            order.setPaymentStatus(PaymentStatus.CANCELLED);
+
+            // Revert stock quantities
+            for (OrderItem item : order.getItems()) {
+                Product product = productRepository.findById(item.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found for reverting stock"));
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                productRepository.save(product);
+            }
+        }
+
+        Order updatedOrder = orderRepository.save(order);
+        log.info("Order status with ID {} updated from {} to {}", orderId, currentStatus, newStatus);
+        return mapToOrderResponse(updatedOrder);
+    }
+
     private String generateOrderCode() {
         String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         int randomPart = secureRandom.nextInt(9000) + 1000;

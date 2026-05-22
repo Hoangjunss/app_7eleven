@@ -11,4 +11,9 @@ public interface OrderService {
     Page<OrderResponse> getOrdersForUser(Long userId, OrderStatus status, Pageable pageable);
     OrderResponse getOrderDetails(Long userId, Long orderId);
     void cancelOrder(Long userId, Long orderId);
+    
+    // Admin methods
+    Page<OrderResponse> getAllOrders(OrderStatus status, Long userId, Pageable pageable);
+    OrderResponse getOrderById(Long orderId);
+    OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus);
 }
