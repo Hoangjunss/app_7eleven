@@ -18,3 +18,7 @@ spring:
         enabled: false
   flyway:
     enabled: false # Disable Flyway in test to speed up and avoid PG-specific migration scripts incompatibility
+
+jwt:
+  secret: devsecretkeydevsecretkeydevsecretkeydevsecretkeydevsecretkey
+  expiration: 604800
