@@ -1,0 +1,69 @@
+"use client";
+
+/**
+ * Premium Admin Sidebar component.
+ * Collates navigation links for system administration (Products, Categories, Orders)
+ * with hover micro-animations and active routing states.
+ */
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Package, FolderTree, ShoppingCart } from "lucide-react";
+
+export default function AdminSidebar() {
+  const pathname = usePathname();
+
+  const menuItems = [
+    {
+      name: "Products",
+      href: "/admin/products",
+      icon: Package,
+    },
+    {
+      name: "Categories",
+      href: "/admin/categories",
+      icon: FolderTree,
+    },
+    {
+      name: "Orders",
+      href: "/admin/orders",
+      icon: ShoppingCart,
+    },
+  ];
+
+  return (
+    <aside className="w-64 shrink-0 border-r border-white/10 bg-[#09090b]/40 backdrop-blur-md min-h-[calc(100vh-69px)] flex flex-col p-4 space-y-2">
+      <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        Management Menu
+      </div>
+      <nav className="flex-1 space-y-1">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname.startsWith(item.href);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer",
+                isActive
+                  ? "bg-primary text-white shadow-md shadow-primary/20"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Icon
+                className={cn(
+                  "h-4 w-4",
+                  isActive ? "text-white" : "text-zinc-500 group-hover:text-white"
+                )}
+              />
+              {item.name}
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
