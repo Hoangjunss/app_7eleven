@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -26,14 +27,17 @@ public class CartServiceImpl implements CartService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ProductRepository productRepository;
-    private final HashOperations<String, String, Integer> hashOps;
 
     @Autowired
     public CartServiceImpl(RedisTemplate<String, Object> redisTemplate,
             ProductRepository productRepository) {
         this.redisTemplate = redisTemplate;
         this.productRepository = productRepository;
-        this.hashOps = redisTemplate.opsForHash();
+    }
+
+    @SuppressWarnings("unchecked")
+    private HashOperations<String, String, Integer> hashOps() {
+        return (HashOperations<String, String, Integer>) (HashOperations) redisTemplate.opsForHash();
     }
 
     private String cartKey(Long userId) {
@@ -47,9 +51,9 @@ public class CartServiceImpl implements CartService {
         }
         String key = cartKey(userId);
         // Increment existing quantity or set new
-        Integer existing = hashOps.get(key, productId.toString());
+        Integer existing = hashOps().get(key, productId.toString());
         int newQty = (existing == null) ? quantity : existing + quantity;
-        hashOps.put(key, productId.toString(), newQty);
+        hashOps().put(key, productId.toString(), newQty);
         redisTemplate.expire(key, CART_TTL);
     }
 
@@ -58,9 +62,9 @@ public class CartServiceImpl implements CartService {
         String key = cartKey(userId);
         if (quantity <= 0) {
             // If quantity is zero or negative, remove the item
-            hashOps.delete(key, productId.toString());
+            hashOps().delete(key, productId.toString());
         } else {
-            hashOps.put(key, productId.toString(), quantity);
+            hashOps().put(key, productId.toString(), quantity);
         }
         redisTemplate.expire(key, CART_TTL);
     }
@@ -68,7 +72,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeCartItem(Long userId, Long productId) {
         String key = cartKey(userId);
-        hashOps.delete(key, productId.toString());
+        hashOps().delete(key, productId.toString());
         redisTemplate.expire(key, CART_TTL);
     }
 
@@ -79,9 +83,10 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CartResponse getCart(Long userId) {
         String key = cartKey(userId);
-        Map<String, Integer> entries = hashOps.entries(key);
+        Map<String, Integer> entries = hashOps().entries(key);
         List<CartItemResponse> items = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
         for (Map.Entry<String, Integer> entry : entries.entrySet()) {
