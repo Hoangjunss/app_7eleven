@@ -134,7 +134,7 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
     timeStyle: "short",
   }).format(new Date(order.createdAt));
 
-  const handleStatusChangeClick = (statusVal: string) => {
+  const handleStatusChangeClick = (statusVal: string | null) => {
     if (!statusVal) return;
     setSelectedStatus(statusVal as OrderStatus);
     setDialogOpen(true);
@@ -441,4 +441,3 @@ export default function AdminOrderDetailPage({ params }: AdminOrderDetailPagePro
     </div>
   );
 }
-"

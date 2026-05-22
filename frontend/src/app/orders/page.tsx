@@ -73,9 +73,11 @@ export default function MyOrdersPage() {
   const totalPages = data?.data?.totalPages ?? 0;
   const totalElements = data?.data?.totalElements ?? 0;
 
-  const handleStatusChange = (value: string) => {
-    setStatusFilter(value);
-    setPage(0);
+  const handleStatusChange = (value: string | null) => {
+    if (value) {
+      setStatusFilter(value);
+      setPage(0);
+    }
   };
 
   const formatDate = (iso: string) =>

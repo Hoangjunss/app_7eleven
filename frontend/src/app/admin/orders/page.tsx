@@ -76,9 +76,11 @@ export default function AdminOrdersPage() {
     }, 300);
   };
 
-  const handleStatusChange = (value: string) => {
-    setStatusFilter(value);
-    setPage(0);
+  const handleStatusChange = (value: string | null) => {
+    if (value) {
+      setStatusFilter(value);
+      setPage(0);
+    }
   };
 
   const { data, isLoading, isError, refetch } = useAllOrders({
