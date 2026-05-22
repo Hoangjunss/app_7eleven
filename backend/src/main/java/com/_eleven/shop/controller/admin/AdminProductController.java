@@ -1,0 +1,70 @@
+package com._eleven.shop.controller.admin;
+
+import com._eleven.shop.aspect.Auditable;
+import com._eleven.shop.dto.ApiResponse;
+import com._eleven.shop.dto.ProductRequest;
+import com._eleven.shop.dto.ProductResponse;
+import com._eleven.shop.service.ProductService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+
+@RestController
+@RequestMapping("/api/v1/admin/products")
+@RequiredArgsConstructor
+public class AdminProductController {
+
+    private final ProductService productService;
+
+    @PostMapping
+    @Auditable(action = "CREATE_PRODUCT", entityType = "PRODUCT")
+    public ApiResponse<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
+        ProductResponse response = productService.createProduct(request);
+        return ApiResponse.success(response, "Product created successfully");
+    }
+
+    @PutMapping("/{id}")
+    @Auditable(action = "UPDATE_PRODUCT", entityType = "PRODUCT")
+    public ApiResponse<ProductResponse> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest request) {
+        ProductResponse response = productService.updateProduct(id, request);
+        return ApiResponse.success(response, "Product updated successfully");
+    }
+
+    @DeleteMapping("/{id}")
+    @Auditable(action = "DELETE_PRODUCT", entityType = "PRODUCT")
+    public ApiResponse<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ApiResponse.success(null, "Product deleted successfully");
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<ProductResponse> getProductById(@PathVariable Long id) {
+        ProductResponse response = productService.getProductById(id);
+        return ApiResponse.success(response, "Product retrieved successfully");
+    }
+
+    @GetMapping
+    public ApiResponse<Page<ProductResponse>> getAllProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+
+        Sort.Direction sortDirection = Sort.Direction.fromString(direction);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        Page<ProductResponse> products = productService.getAllProducts(name, categoryId, minPrice, maxPrice, pageable);
+        return ApiResponse.success(products, "Products retrieved successfully");
+    }
+}
