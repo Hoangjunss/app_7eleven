@@ -89,19 +89,21 @@ export default function Header() {
               )}
 
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center gap-2 text-white/85 hover:text-white hover:bg-white/5 px-2 py-1.5 h-auto cursor-pointer"
-                  >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary font-semibold text-xs border border-primary/30">
-                      {user.fullName.substring(0, 2).toUpperCase()}
-                    </div>
-                    <span className="hidden md:inline-block text-sm font-medium">
-                      {user.fullName}
-                    </span>
-                    <ChevronDown className="h-4 w-4 opacity-50" />
-                  </Button>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      className="flex items-center gap-2 text-white/85 hover:text-white hover:bg-white/5 px-2 py-1.5 h-auto cursor-pointer"
+                    />
+                  }
+                >
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-primary font-semibold text-xs border border-primary/30">
+                    {user.fullName.substring(0, 2).toUpperCase()}
+                  </div>
+                  <span className="hidden md:inline-block text-sm font-medium">
+                    {user.fullName}
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
@@ -114,18 +116,24 @@ export default function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-white/10" />
-                  <DropdownMenuItem asChild className="hover:bg-white/5 cursor-pointer">
-                    <Link href="/profile" className="flex w-full items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      Profile Settings
-                    </Link>
+                  <DropdownMenuItem
+                    render={
+                      <Link href="/profile" className="flex w-full items-center gap-2" />
+                    }
+                    className="hover:bg-white/5 cursor-pointer"
+                  >
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    Profile Settings
                   </DropdownMenuItem>
                   {role === "ADMIN" && (
-                    <DropdownMenuItem asChild className="hover:bg-white/5 cursor-pointer sm:hidden">
-                      <Link href="/admin/products" className="flex w-full items-center gap-2">
-                        <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                        Admin Dashboard
-                      </Link>
+                    <DropdownMenuItem
+                      render={
+                        <Link href="/admin/products" className="flex w-full items-center gap-2" />
+                      }
+                      className="hover:bg-white/5 cursor-pointer sm:hidden"
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+                      Admin Dashboard
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator className="bg-white/10" />
