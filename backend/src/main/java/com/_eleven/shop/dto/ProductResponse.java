@@ -24,6 +24,7 @@ public class ProductResponse {
     private String categoryName;
     private Long version;
     private List<ProductImageResponse> images;
+    private String primaryImageUrl;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 }
