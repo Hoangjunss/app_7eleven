@@ -7,12 +7,13 @@
  */
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { useCartStore } from "@/stores/cartStore";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -25,10 +26,13 @@ import CartDrawer from "@/components/cart/CartDrawer";
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated, logout, role } = useAuthStore();
   const itemCount = useCartStore((s) => s.itemCount);
   const [isMounted, setIsMounted] = useState(false);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+
+  const isAdminPage = pathname?.startsWith("/admin");
 
   useEffect(() => {
     setIsMounted(true);
@@ -80,19 +84,21 @@ export default function Header() {
 
           {/* Right Side */}
           <div className="flex items-center gap-3">
-            {/* Cart Button – always visible */}
-            <button
-              onClick={() => setCartDrawerOpen(true)}
-              className="relative flex items-center justify-center h-9 w-9 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-              aria-label="Giỏ hàng"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white animate-in zoom-in-75 duration-200">
-                  {itemCount > 99 ? "99+" : itemCount}
-                </span>
-              )}
-            </button>
+            {/* Cart Button – hidden on admin pages */}
+            {!isAdminPage && (
+              <button
+                onClick={() => setCartDrawerOpen(true)}
+                className="relative flex items-center justify-center h-9 w-9 rounded-lg text-white/80 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+                aria-label="Giỏ hàng"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white animate-in zoom-in-75 duration-200">
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {isAuthenticated && user ? (
               <div className="flex items-center gap-2">
@@ -130,28 +136,32 @@ export default function Header() {
                     align="end"
                     className="w-56 border-white/10 bg-zinc-950 text-white"
                   >
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user.fullName}</p>
-                        <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{user.fullName}</p>
+                          <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                        </div>
+                      </DropdownMenuLabel>
+                    </DropdownMenuGroup>
                     <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem
-                      render={
-                        <button
-                          onClick={() => setCartDrawerOpen(true)}
-                          className="flex w-full items-center gap-2"
-                        />
-                      }
-                      className="hover:bg-white/5 cursor-pointer"
-                    >
-                      <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-                      Giỏ hàng
-                      {itemCount > 0 && (
-                        <span className="ml-auto text-xs font-bold text-primary">{itemCount}</span>
-                      )}
-                    </DropdownMenuItem>
+                    {!isAdminPage && (
+                      <DropdownMenuItem
+                        render={
+                          <button
+                            onClick={() => setCartDrawerOpen(true)}
+                            className="flex w-full items-center gap-2"
+                          />
+                        }
+                        className="hover:bg-white/5 cursor-pointer"
+                      >
+                        <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                        Giỏ hàng
+                        {itemCount > 0 && (
+                          <span className="ml-auto text-xs font-bold text-primary">{itemCount}</span>
+                        )}
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       render={
                         <Link href="/profile" className="flex w-full items-center gap-2" />
