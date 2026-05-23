@@ -4,6 +4,7 @@ import com._eleven.shop.dto.UpdateRolesRequest;
 import com._eleven.shop.dto.UserResponse;
 import com._eleven.shop.entity.Role;
 import com._eleven.shop.entity.User;
+import com._eleven.shop.exception.ResourceNotFoundException;
 import com._eleven.shop.repository.RoleRepository;
 import com._eleven.shop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,10 +34,25 @@ public class UserService {
         return userPage.map(this::toResponse);
     }
 
+    private String getCurrentUserEmail() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            throw new IllegalStateException("Authentication context is null");
+        }
+        return authentication.getName();
+    }
+
     @Transactional
     public UserResponse updateRoles(Long id, UpdateRolesRequest request) {
         User user = userRepository.findByIdWithDeleted(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Self-role-demotion prevention check
+        String currentUserEmail = getCurrentUserEmail();
+        boolean wantsAdmin = request.getRoles().stream().anyMatch(roleName -> roleName.equals("ADMIN"));
+        if (user.getEmail().equals(currentUserEmail) && !wantsAdmin) {
+            throw new IllegalArgumentException("Bạn không thể tự gỡ quyền ADMIN của chính mình!");
+        }
 
         Set<Role> roles = request.getRoles().stream()
                 .map(roleName -> roleRepository.findByName(roleName)
@@ -48,19 +66,26 @@ public class UserService {
 
     @Transactional
     public void lockUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            // Check in case user exists but is soft-deleted
-            userRepository.findByIdWithDeleted(id)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+        User user = userRepository.findByIdWithDeleted(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        // Self-lockout prevention check
+        String currentUserEmail = getCurrentUserEmail();
+        if (user.getEmail().equals(currentUserEmail)) {
+            throw new IllegalArgumentException("Bạn không thể tự khóa tài khoản của chính mình!");
         }
-        userRepository.lockUser(id);
+
+        user.setDeletedAt(OffsetDateTime.now());
+        userRepository.save(user);
     }
 
     @Transactional
     public void restoreUser(Long id) {
-        userRepository.findByIdWithDeleted(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
-        userRepository.restoreUser(id);
+        User user = userRepository.findByIdWithDeleted(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        
+        user.setDeletedAt(null);
+        userRepository.save(user);
     }
 
     private UserResponse toResponse(User user) {

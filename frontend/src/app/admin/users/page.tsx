@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import {
   useAdminUsers,
@@ -52,17 +51,8 @@ import { toast } from "sonner";
 const PAGE_SIZE = 10;
 
 export default function AdminUsersPage() {
-  const router = useRouter();
-  const { isAuthenticated, role, user } = useAuthStore();
+  const { user } = useAuthStore();
   const currentUserEmail = user?.email;
-
-  // Route guard – ADMIN only
-  useEffect(() => {
-    if (!isAuthenticated || role !== "ADMIN") {
-      toast.error("Bạn không có quyền truy cập trang này.");
-      router.push("/");
-    }
-  }, [isAuthenticated, role, router]);
 
   // States
   const [page, setPage] = useState(0);
