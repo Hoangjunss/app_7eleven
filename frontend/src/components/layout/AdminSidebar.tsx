@@ -9,12 +9,17 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Package, FolderTree, ClipboardList, Users } from "lucide-react";
+import { Package, FolderTree, ClipboardList, Users, LayoutDashboard } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
   const menuItems = [
+    {
+      name: "Dashboard",
+      href: "/admin/dashboard",
+      icon: LayoutDashboard,
+    },
     {
       name: "Products",
       href: "/admin/products",

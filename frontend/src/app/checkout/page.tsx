@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -70,12 +69,11 @@ function OrderSummary() {
           <div key={item.productId} className="flex gap-3 items-start">
             <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-900 border border-white/10 shrink-0">
               {item.thumbnailUrl ? (
-                <Image
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={item.thumbnailUrl}
                   alt={item.productName}
-                  fill
-                  sizes="48px"
-                  className="object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               ) : (
                 <div className="flex items-center justify-center w-full h-full text-zinc-700 text-xs">?</div>

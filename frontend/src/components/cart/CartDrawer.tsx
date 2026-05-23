@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCartStore } from "@/stores/cartStore";
@@ -107,12 +106,11 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   {/* Thumbnail */}
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-zinc-800 shrink-0">
                     {item.thumbnailUrl ? (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={item.thumbnailUrl}
                         alt={item.productName}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
                       <div className="flex items-center justify-center w-full h-full text-zinc-600 text-xs">No img</div>
