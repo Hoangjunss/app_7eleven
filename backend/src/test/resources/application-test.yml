@@ -22,3 +22,9 @@ spring:
 jwt:
   secret: devsecretkeydevsecretkeydevsecretkeydevsecretkeydevsecretkey
   expiration: 604800
+
+cloudinary:
+  cloud-name: test_cloud
+  api-key: test_key
+  api-secret: test_secret
+

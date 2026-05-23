@@ -17,9 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/v1/admin/products")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminProductController {
 
     private final ProductService productService;

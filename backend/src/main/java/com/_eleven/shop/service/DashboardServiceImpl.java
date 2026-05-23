@@ -58,7 +58,8 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<RevenueChartResponse> getRevenueChart(OffsetDateTime startDate, OffsetDateTime endDate) {
-        List<Order> orders = orderRepository.findAllByStatusAndCreatedAtBetween(OrderStatus.DELIVERED, startDate, endDate);
+        // Query aggregated database records
+        List<Object[]> rows = orderRepository.findRevenueChartData(OrderStatus.DELIVERED, startDate, endDate);
 
         // Pre-fill dates in TreeMap to guarantee sorted order and fill in empty days
         Map<LocalDate, BigDecimal> revenueMap = new TreeMap<>();
@@ -71,12 +72,32 @@ public class DashboardServiceImpl implements DashboardService {
             countMap.put(date, 0L);
         }
 
-        // Fill real values
-        for (Order order : orders) {
-            LocalDate orderDate = order.getCreatedAt().toLocalDate();
-            if (revenueMap.containsKey(orderDate)) {
-                revenueMap.put(orderDate, revenueMap.get(orderDate).add(order.getTotalAmount()));
-                countMap.put(orderDate, countMap.get(orderDate) + 1);
+        // Fill mapping from SQL rows with safe casting
+        for (Object[] row : rows) {
+            LocalDate dateVal = null;
+            if (row[0] instanceof java.sql.Date sqlDate) {
+                dateVal = sqlDate.toLocalDate();
+            } else if (row[0] instanceof java.time.LocalDate localDate) {
+                dateVal = localDate;
+            } else if (row[0] instanceof java.util.Date utilDate) {
+                dateVal = new java.sql.Date(utilDate.getTime()).toLocalDate();
+            }
+
+            BigDecimal revenue = BigDecimal.ZERO;
+            if (row[1] instanceof BigDecimal bd) {
+                revenue = bd;
+            } else if (row[1] instanceof Number num) {
+                revenue = BigDecimal.valueOf(num.doubleValue());
+            }
+
+            Long count = 0L;
+            if (row[2] instanceof Number num) {
+                count = num.longValue();
+            }
+
+            if (dateVal != null && revenueMap.containsKey(dateVal)) {
+                revenueMap.put(dateVal, revenue);
+                countMap.put(dateVal, count);
             }
         }
 
