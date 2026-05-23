@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -62,12 +61,11 @@ function CartItemRow({ item, onUpdate, onRemove, disabled }: CartItemRowProps) {
       {/* Image */}
       <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-zinc-900 border border-white/10 shrink-0">
         {item.thumbnailUrl ? (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={item.thumbnailUrl}
             alt={item.productName}
-            fill
-            sizes="96px"
-            className="object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
           <div className="flex items-center justify-center w-full h-full text-zinc-600 text-xs">

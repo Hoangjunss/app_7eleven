@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProductDetail } from "@/hooks/useProductDetail";
@@ -143,13 +142,11 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
         <div className="flex flex-col gap-4">
           <div className="relative w-full aspect-square bg-zinc-900 border border-white/10 rounded-xl overflow-hidden shadow-lg shadow-black/20">
             {mainImage ? (
-              <Image
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
                 src={mainImage}
                 alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-                priority
+                className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (
               <div className="flex items-center justify-center w-full h-full text-zinc-550 text-sm font-medium">
@@ -178,12 +175,11 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                       : "border-white/10 hover:border-white/30"
                   }`}
                 >
-                  <Image
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
                     src={img.imageUrl}
                     alt={`${product.name} thumbnail`}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </button>
               ))}

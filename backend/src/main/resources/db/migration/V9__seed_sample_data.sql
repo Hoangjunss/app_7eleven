@@ -5,6 +5,15 @@
 -- Ensure pgcrypto extension is installed for BCrypt password hashing
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Cleanup existing conflicting rows to allow clean seed insertion with exact IDs
+DELETE FROM order_items WHERE id BETWEEN 1 AND 100;
+DELETE FROM orders WHERE id BETWEEN 1 AND 100;
+DELETE FROM product_images WHERE id BETWEEN 1 AND 500;
+DELETE FROM products WHERE id BETWEEN 1 AND 500;
+DELETE FROM categories WHERE id BETWEEN 1 AND 100;
+DELETE FROM user_roles WHERE user_id IN (1, 2, 3) OR user_id IN (SELECT id FROM users WHERE email IN ('admin@7eleven.com', 'user1@example.com', 'user2@example.com'));
+DELETE FROM users WHERE id IN (1, 2, 3) OR email IN ('admin@7eleven.com', 'user1@example.com', 'user2@example.com');
+
 -- =========================================================================
 -- 1. SEED ROLES
 -- =========================================================================
