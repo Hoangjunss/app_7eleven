@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useDashboardKpi, useDashboardRevenue, useDashboardTopProducts, useDashboardRecentOrders } from "@/hooks/useAdminDashboard";
 import KpiCards from "@/components/dashboard/KpiCards";
 import RevenueChart from "@/components/dashboard/RevenueChart";
@@ -12,10 +12,10 @@ import { ExternalLink } from "lucide-react";
 export default function AdminDashboardPage() {
   const [period, setPeriod] = useState<"today" | "7days" | "30days">("7days");
 
-  const getDateRange = () => {
+  const { startDate, endDate } = useMemo(() => {
     const end = new Date();
     const start = new Date();
-    
+
     if (period === "today") {
       start.setHours(0, 0, 0, 0);
       end.setHours(23, 59, 59, 999);
@@ -26,14 +26,12 @@ export default function AdminDashboardPage() {
       start.setDate(start.getDate() - 29);
       start.setHours(0, 0, 0, 0);
     }
-    
+
     return {
       startDate: start.toISOString(),
       endDate: end.toISOString(),
     };
-  };
-
-  const { startDate, endDate } = getDateRange();
+  }, [period]);
 
   const { data: kpi, isLoading: isKpiLoading } = useDashboardKpi(startDate, endDate);
   const { data: revenue, isLoading: isRevenueLoading } = useDashboardRevenue(startDate, endDate);
