@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -89,16 +90,34 @@ public class CartServiceImpl implements CartService {
         Map<String, Integer> entries = hashOps().entries(key);
         List<CartItemResponse> items = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
+
+        if (entries.isEmpty()) {
+            return CartResponse.builder()
+                    .items(items)
+                    .totalAmount(total)
+                    .build();
+        }
+
+        // Collect all product IDs
+        List<Long> productIds = entries.keySet().stream()
+                .map(Long::valueOf)
+                .toList();
+
+        // Batch load products and fetch join their images in 1 query
+        List<Product> products = productRepository.findAllByIdsWithImages(productIds);
+        Map<Long, Product> productMap = products.stream()
+                .collect(Collectors.toMap(Product::getId, p -> p));
+
         for (Map.Entry<String, Integer> entry : entries.entrySet()) {
             Long productId = Long.valueOf(entry.getKey());
             Integer qty = entry.getValue();
-            Optional<Product> optProd = productRepository.findById(productId);
-            if (optProd.isEmpty()) {
-                // Skip missing products but log warning
+            Product product = productMap.get(productId);
+
+            if (product == null) {
                 log.warn("Product with id {} not found while building cart for user {}", productId, userId);
                 continue;
             }
-            Product product = optProd.get();
+
             BigDecimal subtotal = product.getPrice().multiply(BigDecimal.valueOf(qty));
             CartItemResponse item = CartItemResponse.builder()
                     .productId(productId)
@@ -111,6 +130,7 @@ public class CartServiceImpl implements CartService {
             items.add(item);
             total = total.add(subtotal);
         }
+
         return CartResponse.builder()
                 .items(items)
                 .totalAmount(total)

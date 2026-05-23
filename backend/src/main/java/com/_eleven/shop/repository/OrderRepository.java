@@ -29,6 +29,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findAllByStatusAndCreatedAtBetween(OrderStatus status, OffsetDateTime startDate, OffsetDateTime endDate);
 
-    @Query("SELECT o FROM Order o ORDER BY o.createdAt DESC")
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items ORDER BY o.createdAt DESC")
     List<Order> findRecentOrders(Pageable pageable);
+
+    @Query("SELECT CAST(o.createdAt AS date) as dateVal, SUM(o.totalAmount) as revenue, COUNT(o) as orderCount " +
+           "FROM Order o " +
+           "WHERE o.status = :status AND o.createdAt BETWEEN :startDate AND :endDate " +
+           "GROUP BY CAST(o.createdAt AS date) " +
+           "ORDER BY dateVal ASC")
+    List<Object[]> findRevenueChartData(
+            @Param("status") OrderStatus status,
+            @Param("startDate") OffsetDateTime startDate,
+            @Param("endDate") OffsetDateTime endDate
+    );
 }

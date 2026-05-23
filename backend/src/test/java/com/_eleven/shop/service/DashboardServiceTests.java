@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,17 +81,15 @@ public class DashboardServiceTests {
         OffsetDateTime start = OffsetDateTime.now().minusDays(2).withHour(0).withMinute(0).withSecond(0).withNano(0);
         OffsetDateTime end = OffsetDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999000000);
 
-        List<Order> orders = new ArrayList<>();
-        // Create an order for today
-        orders.add(Order.builder()
-                .totalAmount(new BigDecimal("150000"))
-                .status(OrderStatus.DELIVERED)
-                .createdAt(OffsetDateTime.now())
-                .items(new ArrayList<>())
-                .user(User.builder().id(1L).build())
-                .build());
+        List<Object[]> mockChartData = new ArrayList<>();
+        // Add row for today (which is start + 2 days)
+        mockChartData.add(new Object[]{
+                LocalDate.now(),
+                new BigDecimal("150000"),
+                1L
+        });
 
-        when(orderRepository.findAllByStatusAndCreatedAtBetween(OrderStatus.DELIVERED, start, end)).thenReturn(orders);
+        when(orderRepository.findRevenueChartData(OrderStatus.DELIVERED, start, end)).thenReturn(mockChartData);
 
         List<RevenueChartResponse> chart = dashboardService.getRevenueChart(start, end);
 
