@@ -112,12 +112,16 @@ jobs:
             echo "[ENV] Ghi cấu hình file .env.prod..."
             echo "${{ secrets.ENV_PROD_CONTENT }}" > .env.prod
 
-            # 5. Build và khởi chạy container
-            echo "[DOCKER] Tiến hành hạ các container cũ và build container mới..."
+            # 5. Khởi chạy container từ image mới
+            echo "[DOCKER] Tiến hành hạ các container cũ..."
             docker compose -f docker-compose.yml --env-file .env.prod down --remove-orphans
             
-            # Khởi chạy Docker Compose build (Build trực tiếp trên máy hoặc có thể tích hợp registry)
-            docker compose -f docker-compose.yml --env-file .env.prod up --build -d
+            echo "[DOCKER] Kéo các image mới nhất từ GHCR..."
+            docker compose -f docker-compose.yml --env-file .env.prod pull
+
+            echo "[DOCKER] Khởi động các container..."
+            docker compose -f docker-compose.yml --env-file .env.prod up -d --remove-orphans
+
 
             # 6. Kiểm tra trạng thái sức khỏe (Healthcheck) sau khi deploy
             echo "[HEALTHCHECK] Chờ các service khởi động trong 15 giây..."
