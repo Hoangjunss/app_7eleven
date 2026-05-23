@@ -18,8 +18,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "7-Eleven Shop",
-  description: "Next-generation 7-Eleven Convenience Store Dashboard",
+  title: {
+    template: "%s | 7Eleven Shop",
+    default: "7Eleven Shop",
+  },
+  description: "Hệ thống mua sắm và quản lý đơn hàng Next-generation 7-Eleven Convenience Store",
+  keywords: ["7eleven", "7-eleven", "cửa hàng tiện lợi", "mua sắm online", "7eleven shop"],
+  openGraph: {
+    title: "7Eleven Shop",
+    description: "Hệ thống mua sắm và quản lý đơn hàng Next-generation 7-Eleven Convenience Store",
+    type: "website",
+    locale: "vi_VN",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "7Eleven Shop",
+    description: "Hệ thống mua sắm và quản lý đơn hàng Next-generation 7-Eleven Convenience Store",
+  },
 };
 
 export default function RootLayout({
