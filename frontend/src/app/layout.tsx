@@ -8,11 +8,13 @@ const ibmPlexSans = IBM_Plex_Sans({
   variable: "--font-sans",
   subsets: ["vietnamese", "latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
