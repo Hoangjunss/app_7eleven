@@ -34,7 +34,7 @@ interface CartState {
   clearCart: (invalidate: () => void) => Promise<void>;
 }
 
-export const useCartStore = create<CartState>()((set, get) => ({
+export const useCartStore = create<CartState>()((set) => ({
   items: [],
   totalAmount: 0,
   itemCount: 0,

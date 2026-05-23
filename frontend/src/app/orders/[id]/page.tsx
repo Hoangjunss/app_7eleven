@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { useOrderDetail } from "@/hooks/useOrderDetail";
 import { useCancelOrder } from "@/hooks/useCancelOrder";
 import { formatCurrency } from "@/components/product/ProductCard";
@@ -92,7 +92,6 @@ function StatusBadge({ status }: { status: OrderStatus }) {
 
 export default function OrderDetailPage({ params }: OrderDetailPageProps) {
   const { id } = React.use(params);
-  const router = useRouter();
   const { data, isLoading, isError, refetch } = useOrderDetail(id);
   const cancelMutation = useCancelOrder(id);
 
@@ -155,7 +154,6 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     );
   }
 
-  const statusCfg = STATUS_CONFIG[order.status as OrderStatus] ?? STATUS_CONFIG.PENDING;
   const canCancel = order.status === "PENDING";
   const isSuccess = order.status !== "CANCELLED";
 
