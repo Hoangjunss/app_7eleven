@@ -9,7 +9,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Package, FolderTree, ShoppingCart } from "lucide-react";
+import { Package, FolderTree, ClipboardList } from "lucide-react";
 
 export default function AdminSidebar() {
   const pathname = usePathname();
@@ -28,7 +28,7 @@ export default function AdminSidebar() {
     {
       name: "Orders",
       href: "/admin/orders",
-      icon: ShoppingCart,
+      icon: ClipboardList,
     },
   ];
 

@@ -55,6 +55,23 @@ export interface GetOrdersParams {
   direction?: "asc" | "desc";
 }
 
+export interface GetAdminOrdersParams {
+  page?: number;
+  size?: number;
+  status?: OrderStatus;
+  userId?: number;
+  sortBy?: string;
+  direction?: "asc" | "desc";
+}
+
+export interface PagedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 // ─── Service ─────────────────────────────────────────────────────────────────
 
 export const orderService = {
@@ -71,14 +88,8 @@ export const orderService = {
   },
 
   /** GET /api/v1/orders?page=&size=&status= */
-  async getMyOrders(params?: GetOrdersParams): Promise<ApiResponse<{
-    content: Order[];
-    totalElements: number;
-    totalPages: number;
-    number: number;
-    size: number;
-  }>> {
-    const res = await apiClient.get("/orders", { params });
+  async getMyOrders(params?: GetOrdersParams): Promise<ApiResponse<PagedResponse<Order>>> {
+    const res = await apiClient.get<ApiResponse<PagedResponse<Order>>>("/orders", { params });
     return res.data;
   },
 
@@ -87,4 +98,32 @@ export const orderService = {
     const res = await apiClient.patch<ApiResponse<null>>(`/orders/${id}/cancel`);
     return res.data;
   },
+
+  // ─── Admin ──────────────────────────────────────────────────────────────
+
+  /** GET /api/v1/admin/orders?page=&size=&status=&userId= */
+  async getAllOrdersAdmin(params?: GetAdminOrdersParams): Promise<ApiResponse<PagedResponse<Order>>> {
+    const res = await apiClient.get<ApiResponse<PagedResponse<Order>>>("/admin/orders", { params });
+    return res.data;
+  },
+
+  /** GET /api/v1/admin/orders/{id} */
+  async getOrderByIdAdmin(id: number | string): Promise<ApiResponse<Order>> {
+    const res = await apiClient.get<ApiResponse<Order>>(`/admin/orders/${id}`);
+    return res.data;
+  },
+
+  /**
+   * PATCH /api/v1/admin/orders/{id}/status?status={status}
+   * Backend uses @RequestParam, so status must be a query param not body.
+   */
+  async updateOrderStatus(id: number | string, status: OrderStatus): Promise<ApiResponse<Order>> {
+    const res = await apiClient.patch<ApiResponse<Order>>(
+      `/admin/orders/${id}/status`,
+      null,
+      { params: { status } }
+    );
+    return res.data;
+  },
 };
+
