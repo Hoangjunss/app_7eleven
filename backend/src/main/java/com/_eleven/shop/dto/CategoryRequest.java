@@ -17,5 +17,6 @@ public class CategoryRequest {
     @Size(max = 255, message = "Category name cannot exceed 255 characters")
     private String name;
 
+    @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     private String description;
 }

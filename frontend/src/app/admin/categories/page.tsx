@@ -278,6 +278,7 @@ export default function AdminCategoriesPage() {
               <label className="text-xs text-zinc-400 font-medium">Tên danh mục *</label>
               <Input
                 required
+                maxLength={255}
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder="Ví dụ: Đồ ăn nhanh, Nước giải khát..."
@@ -289,6 +290,7 @@ export default function AdminCategoriesPage() {
               <label className="text-xs text-zinc-400 font-medium">Mô tả danh mục</label>
               <textarea
                 rows={3}
+                maxLength={2000}
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder="Nhập vài câu mô tả về danh mục này..."

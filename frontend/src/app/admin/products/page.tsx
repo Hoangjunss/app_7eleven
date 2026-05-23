@@ -497,6 +497,7 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Tên sản phẩm *</label>
                   <Input
                     required
+                    maxLength={255}
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="Nhập tên sản phẩm..."
@@ -551,6 +552,7 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Mô tả sản phẩm</label>
                   <textarea
                     rows={4}
+                    maxLength={2000}
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Mô tả sản phẩm chi tiết..."

@@ -22,5 +22,7 @@ public class RegisterRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @NotBlank(message = "Full name is required")
+    @Size(max = 255, message = "Full name cannot exceed 255 characters")
     private String fullName;
 }
