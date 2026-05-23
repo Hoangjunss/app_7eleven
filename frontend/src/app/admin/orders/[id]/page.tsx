@@ -33,11 +33,6 @@ import {
 import { toast } from "sonner";
 import {
   ArrowLeft,
-  Clock,
-  CheckCircle2,
-  Truck,
-  PackageCheck,
-  Ban,
   AlertTriangle,
   User,
   Phone,
