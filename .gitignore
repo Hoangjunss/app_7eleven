@@ -54,3 +54,7 @@ logs/
 backend/uploads/
 uploads/
 temp/
+
+# Exclude testing guide per user request
+DOCKER_TEST_GUIDE.md
+
