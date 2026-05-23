@@ -31,7 +31,7 @@ public class CloudinaryStorageService {
         try {
             Map<?, ?> options = ObjectUtils.asMap(
                     "folder", folder,
-                    "resource_type", "auto"
+                    "resource_type", "image"
             );
             Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
             return (String) uploadResult.get("secure_url");
