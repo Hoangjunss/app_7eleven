@@ -1,6 +1,9 @@
--- Flyway Migration: V6__seed_sample_data.sql
+-- Flyway Migration: V9__seed_sample_data.sql
 -- Seed sample data for 7Eleven Shop (PostgreSQL 16)
 -- Target Tables: roles, users, user_roles, categories, products, product_images, orders, order_items
+
+-- Ensure pgcrypto extension is installed for BCrypt password hashing
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- =========================================================================
 -- 1. SEED ROLES
@@ -11,13 +14,12 @@ INSERT INTO roles (id, name, created_at, updated_at) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- =========================================================================
--- 2. SEED USERS
+-- 2. SEED USERS WITH BCRYPT ENCRYPTED PASSWORDS
 -- =========================================================================
--- TODO: Mã hóa BCrypt trước khi dùng thật (ví dụ UPDATE users SET password = crypt('admin123', gen_salt('bf'))
 INSERT INTO users (id, email, password, full_name, created_at, updated_at) VALUES
-(1, 'admin@7eleven.com', 'admin123', 'Quản trị viên', NOW(), NOW()),
-(2, 'user1@example.com', 'user123', 'Nguyễn Văn A', NOW(), NOW()),
-(3, 'user2@example.com', 'user123', 'Trần Thị B', NOW(), NOW())
+(1, 'admin@7eleven.com', crypt('admin123', gen_salt('bf', 10)), 'Quản trị viên', NOW(), NOW()),
+(2, 'user1@example.com', crypt('user123', gen_salt('bf', 10)), 'Nguyễn Văn A', NOW(), NOW()),
+(3, 'user2@example.com', crypt('user123', gen_salt('bf', 10)), 'Trần Thị B', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- Map users to roles
@@ -43,34 +45,34 @@ ON CONFLICT (id) DO NOTHING;
 -- =========================================================================
 INSERT INTO products (id, name, description, price, stock_quantity, category_id, version, created_at, updated_at) VALUES
 -- Category 1: Điện thoại (id: 1..4)
-(1, 'iPhone 15 Pro Max 256GB', 'Thiết kế khung Titanium siêu bền, chip A17 Pro mạnh mẽ, camera zoom 5x chuyên nghiệp.', 24990000, 50, 1, 0, NOW(), NOW()),
-(2, 'Samsung Galaxy S24 Ultra 256GB', 'Tích hợp bút S-Pen, camera 200MP zoom 100x kèm nhiều tính năng AI thông minh vượt trội.', 23990000, 30, 1, 0, NOW(), NOW()),
-(3, 'Xiaomi 14 Ultra 5G', 'Hệ thống ống kính Leica cao cấp, cảm biến 1 inch thu sáng tối đa, sạc siêu nhanh 90W.', 20990000, 20, 1, 0, NOW(), NOW()),
-(4, 'Google Pixel 8 Pro 128GB', 'Trải nghiệm Android thuần khiết, xử lý ảnh bằng trí tuệ nhân tạo Tensor G3 ấn tượng.', 17500000, 15, 1, 0, NOW(), NOW()),
+(1, 'iPhone 15 Pro Max 256GB', 'Thiết kế khung Titanium siêu bền, chip A17 Pro mạnh mẽ, camera zoom 5x chuyên nghiệp.', 24990000.00, 50, 1, 0, NOW(), NOW()),
+(2, 'Samsung Galaxy S24 Ultra 256GB', 'Tích hợp bút S-Pen, camera 200MP zoom 100x kèm nhiều tính năng AI thông minh vượt trội.', 23990000.00, 30, 1, 0, NOW(), NOW()),
+(3, 'Xiaomi 14 Ultra 5G', 'Hệ thống ống kính Leica cao cấp, cảm biến 1 inch thu sáng tối đa, sạc siêu nhanh 90W.', 20990000.00, 20, 1, 0, NOW(), NOW()),
+(4, 'Google Pixel 8 Pro 128GB', 'Trải nghiệm Android thuần khiết, xử lý ảnh bằng trí tuệ nhân tạo Tensor G3 ấn tượng.', 17500000.00, 15, 1, 0, NOW(), NOW()),
 
 -- Category 2: Laptop (id: 5..8)
-(5, 'MacBook Air 13-inch M3 8GB/256GB', 'Chip M3 thế hệ mới, mỏng nhẹ, pin cực trâu lên tới 18 tiếng, không quạt tản nhiệt yên tĩnh.', 24990000, 25, 2, 0, NOW(), NOW()),
-(6, 'Asus ROG Zephyrus G14 2024', 'Laptop gaming cao cấp màn hình OLED, chip Ryzen 9 mạnh mẽ kèm card rời RTX 4060.', 24990000, 10, 2, 0, NOW(), NOW()),
-(7, 'Dell XPS 13 9340 Core Ultra 7', 'Vỏ nhôm nguyên khối sang trọng, màn hình vô cực thời thượng cùng bàn phím tràn viền độc đáo.', 24500000, 12, 2, 0, NOW(), NOW()),
-(8, 'Lenovo ThinkPad X1 Carbon Gen 11', 'Độ bền chuẩn quân đội, bàn phím gõ tốt nhất thế giới, bảo mật vân tay và nhận diện khuôn mặt.', 24900000, 8, 2, 0, NOW(), NOW()),
+(5, 'MacBook Air 13-inch M3 8GB/256GB', 'Chip M3 thế hệ mới, mỏng nhẹ, pin cực trâu lên tới 18 tiếng, không quạt tản nhiệt yên tĩnh.', 24990000.00, 25, 2, 0, NOW(), NOW()),
+(6, 'Asus ROG Zephyrus G14 2024', 'Laptop gaming cao cấp màn hình OLED, chip Ryzen 9 mạnh mẽ kèm card rời RTX 4060.', 24990000.00, 10, 2, 0, NOW(), NOW()),
+(7, 'Dell XPS 13 9340 Core Ultra 7', 'Vỏ nhôm nguyên khối sang trọng, màn hình vô cực thời thượng cùng bàn phím tràn viền độc đáo.', 24500000.00, 12, 2, 0, NOW(), NOW()),
+(8, 'Lenovo ThinkPad X1 Carbon Gen 11', 'Độ bền chuẩn quân đội, bàn phím gõ tốt nhất thế giới, bảo mật vân tay và nhận diện khuôn mặt.', 24900000.00, 8, 2, 0, NOW(), NOW()),
 
 -- Category 3: Tablet (id: 9..11)
-(9, 'iPad Pro 11-inch M2 Wi-Fi 128GB', 'Hiệu năng đỉnh cao tương đương máy tính với chip Apple M2, màn hình Liquid Retina siêu mượt.', 21990000, 30, 3, 0, NOW(), NOW()),
-(10, 'Samsung Galaxy Tab S9 128GB', 'Màn hình Dynamic AMOLED 2X rực rỡ, kèm sẵn bút S-Pen đa năng, kháng nước kháng bụi IP68.', 16900000, 20, 3, 0, NOW(), NOW()),
-(11, 'iPad Air 5 M1 Wi-Fi 64GB', 'Cấu hình mạnh mẽ giá hợp lý với chip Apple M1, nhiều màu sắc thời trang năng động.', 13990000, 40, 3, 0, NOW(), NOW()),
+(9, 'iPad Pro 11-inch M2 Wi-Fi 128GB', 'Hiệu năng đỉnh cao tương đương máy tính với chip Apple M2, màn hình Liquid Retina siêu mượt.', 21990000.00, 30, 3, 0, NOW(), NOW()),
+(10, 'Samsung Galaxy Tab S9 128GB', 'Màn hình Dynamic AMOLED 2X rực rỡ, kèm sẵn bút S-Pen đa năng, kháng nước kháng bụi IP68.', 16900000.00, 20, 3, 0, NOW(), NOW()),
+(11, 'iPad Air 5 M1 Wi-Fi 64GB', 'Cấu hình mạnh mẽ giá hợp lý với chip Apple M1, nhiều màu sắc thời trang năng động.', 13990000.00, 40, 3, 0, NOW(), NOW()),
 
 -- Category 4: Phụ kiện (id: 12..15)
-(12, 'Sạc dự phòng Anker 335 20000mAh', 'Hỗ trợ sạc nhanh Power Delivery 20W, dung lượng lớn sạc được nhiều thiết bị cùng lúc.', 850000, 100, 4, 0, NOW(), NOW()),
-(13, 'Cáp sạc Apple USB-C to Lightning (1m)', 'Cáp sạc chính hãng Apple truyền tải dữ liệu và sạc nhanh an toàn cho các dòng iPhone cũ.', 390000, 150, 4, 0, NOW(), NOW()),
-(14, 'Chuột Logitech MX Master 3S', 'Thiết kế công thái học cao cấp, cảm biến tracking mọi bề mặt 8k DPI, con lăn MagSpeed siêu tốc.', 2290000, 50, 4, 0, NOW(), NOW()),
-(15, 'Bàn phím cơ không dây Keychron K2 V2', 'Thiết kế layout 75% gọn gàng, kết nối bluetooth 3 thiết bị đồng thời, keycap chất liệu cao cấp.', 1690000, 45, 4, 0, NOW(), NOW()),
+(12, 'Sạc dự phòng Anker 335 20000mAh', 'Hỗ trợ sạc nhanh Power Delivery 20W, dung lượng lớn sạc được nhiều thiết bị cùng lúc.', 850000.00, 100, 4, 0, NOW(), NOW()),
+(13, 'Cáp sạc Apple USB-C to Lightning (1m)', 'Cáp sạc chính hãng Apple truyền tải dữ liệu và sạc nhanh an toàn cho các dòng iPhone cũ.', 390000.00, 150, 4, 0, NOW(), NOW()),
+(14, 'Chuột Logitech MX Master 3S', 'Thiết kế công thái học cao cấp, cảm biến tracking mọi bề mặt 8k DPI, con lăn MagSpeed siêu tốc.', 2290000.00, 50, 4, 0, NOW(), NOW()),
+(15, 'Bàn phím cơ không dây Keychron K2 V2', 'Thiết kế layout 75% gọn gàng, kết nối bluetooth 3 thiết bị đồng thời, keycap chất liệu cao cấp.', 1690000.00, 45, 4, 0, NOW(), NOW()),
 
 -- Category 5: Âm thanh (id: 16..20)
-(16, 'Tai nghe Apple AirPods Pro Gen 2 USB-C', 'Chống ồn chủ động ANC đỉnh cao, cải tiến âm thanh thích ứng và hộp sạc hỗ trợ tìm kiếm Precision.', 5490000, 60, 5, 0, NOW(), NOW()),
-(17, 'Loa Bluetooth JBL Charge 5', 'Âm bass mạnh mẽ đặc trưng JBL, kháng nước kháng bụi IP67, kiêm sạc dự phòng cho điện thoại.', 3490000, 35, 5, 0, NOW(), NOW()),
-(18, 'Tai nghe chụp tai Sony WH-1000XM5', 'Thiết kế sang trọng, khả năng chống ồn hàng đầu thế giới kết hợp mic đàm thoại cực kỳ trong trẻo.', 7990000, 20, 5, 0, NOW(), NOW()),
-(19, 'Loa Marshall Acton III Bluetooth', 'Phong cách vintage cổ điển đặc trưng, âm thanh sống động, tinh chỉnh treble bass trực tiếp trên loa.', 6490000, 15, 5, 0, NOW(), NOW()),
-(20, 'Tai nghe Gaming HyperX Cloud II', 'Âm thanh vòm giả lập 7.1 sống động, đệm tai giả da êm ái thích hợp cho game thủ chơi lâu.', 1790000, 40, 5, 0, NOW(), NOW())
+(16, 'Tai nghe Apple AirPods Pro Gen 2 USB-C', 'Chống ồn chủ động ANC đỉnh cao, cải tiến âm thanh thích ứng và hộp sạc hỗ trợ tìm kiếm Precision.', 5490000.00, 60, 5, 0, NOW(), NOW()),
+(17, 'Loa Bluetooth JBL Charge 5', 'Âm bass mạnh mẽ đặc trưng JBL, kháng nước kháng bụi IP67, kiêm sạc dự phòng cho điện thoại.', 3490000.00, 35, 5, 0, NOW(), NOW()),
+(18, 'Tai nghe chụp tai Sony WH-1000XM5', 'Thiết kế sang trọng, khả năng chống ồn hàng đầu thế giới kết hợp mic đàm thoại cực kỳ trong trẻo.', 7990000.00, 20, 5, 0, NOW(), NOW()),
+(19, 'Loa Marshall Acton III Bluetooth', 'Phong cách vintage cổ điển đặc trưng, âm thanh sống động, tinh chỉnh treble bass trực tiếp trên loa.', 6490000.00, 15, 5, 0, NOW(), NOW()),
+(20, 'Tai nghe Gaming HyperX Cloud II', 'Âm thanh vòm giả lập 7.1 sống động, đệm tai giả da êm ái thích hợp cho game thủ chơi lâu.', 1790000.00, 40, 5, 0, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- =========================================================================
