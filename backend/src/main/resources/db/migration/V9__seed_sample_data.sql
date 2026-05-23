@@ -89,104 +89,104 @@ ON CONFLICT (id) DO NOTHING;
 -- =========================================================================
 INSERT INTO product_images (id, product_id, image_url, is_primary, created_at, updated_at) VALUES
 -- Images for Product 1 (iPhone 15 Pro Max)
-(1, 1, 'https://picsum.photos/id/10/200/200', TRUE, NOW(), NOW()),
-(2, 1, 'https://picsum.photos/id/11/200/200', FALSE, NOW(), NOW()),
-(3, 1, 'https://picsum.photos/id/12/200/200', FALSE, NOW(), NOW()),
+(1, 1, 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(2, 1, 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(3, 1, 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 2 (Galaxy S24 Ultra)
-(4, 2, 'https://picsum.photos/id/20/200/200', TRUE, NOW(), NOW()),
-(5, 2, 'https://picsum.photos/id/21/200/200', FALSE, NOW(), NOW()),
-(6, 2, 'https://picsum.photos/id/22/200/200', FALSE, NOW(), NOW()),
+(4, 2, 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(5, 2, 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(6, 2, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 3 (Xiaomi 14 Ultra)
-(7, 3, 'https://picsum.photos/id/30/200/200', TRUE, NOW(), NOW()),
-(8, 3, 'https://picsum.photos/id/31/200/200', FALSE, NOW(), NOW()),
-(9, 3, 'https://picsum.photos/id/32/200/200', FALSE, NOW(), NOW()),
+(7, 3, 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(8, 3, 'https://images.unsplash.com/photo-1598327106026-d9521da673d1?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(9, 3, 'https://images.unsplash.com/photo-1550537687-c91072c4792d?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 4 (Pixel 8 Pro)
-(10, 4, 'https://picsum.photos/id/40/200/200', TRUE, NOW(), NOW()),
-(11, 4, 'https://picsum.photos/id/41/200/200', FALSE, NOW(), NOW()),
-(12, 4, 'https://picsum.photos/id/42/200/200', FALSE, NOW(), NOW()),
+(10, 4, 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(11, 4, 'https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(12, 4, 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 5 (MacBook Air M3)
-(13, 5, 'https://picsum.photos/id/50/200/200', TRUE, NOW(), NOW()),
-(14, 5, 'https://picsum.photos/id/51/200/200', FALSE, NOW(), NOW()),
-(15, 5, 'https://picsum.photos/id/52/200/200', FALSE, NOW(), NOW()),
+(13, 5, 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(14, 5, 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(15, 5, 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 6 (ROG Zephyrus G14)
-(16, 6, 'https://picsum.photos/id/60/200/200', TRUE, NOW(), NOW()),
-(17, 6, 'https://picsum.photos/id/61/200/200', FALSE, NOW(), NOW()),
-(18, 6, 'https://picsum.photos/id/62/200/200', FALSE, NOW(), NOW()),
+(16, 6, 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(17, 6, 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(18, 6, 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 7 (Dell XPS 13)
-(19, 7, 'https://picsum.photos/id/70/200/200', TRUE, NOW(), NOW()),
-(20, 7, 'https://picsum.photos/id/71/200/200', FALSE, NOW(), NOW()),
-(21, 7, 'https://picsum.photos/id/72/200/200', FALSE, NOW(), NOW()),
+(19, 7, 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(20, 7, 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(21, 7, 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 8 (ThinkPad X1 Carbon)
-(22, 8, 'https://picsum.photos/id/80/200/200', TRUE, NOW(), NOW()),
-(23, 8, 'https://picsum.photos/id/81/200/200', FALSE, NOW(), NOW()),
-(24, 8, 'https://picsum.photos/id/82/200/200', FALSE, NOW(), NOW()),
+(22, 8, 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(23, 8, 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(24, 8, 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 9 (iPad Pro M2)
-(25, 9, 'https://picsum.photos/id/90/200/200', TRUE, NOW(), NOW()),
-(26, 9, 'https://picsum.photos/id/91/200/200', FALSE, NOW(), NOW()),
-(27, 9, 'https://picsum.photos/id/92/200/200', FALSE, NOW(), NOW()),
+(25, 9, 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(26, 9, 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(27, 9, 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 10 (Galaxy Tab S9)
-(28, 10, 'https://picsum.photos/id/13/200/200', TRUE, NOW(), NOW()),
-(29, 10, 'https://picsum.photos/id/14/200/200', FALSE, NOW(), NOW()),
-(30, 10, 'https://picsum.photos/id/15/200/200', FALSE, NOW(), NOW()),
+(28, 10, 'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(29, 10, 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(30, 10, 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 11 (iPad Air 5)
-(31, 11, 'https://picsum.photos/id/23/200/200', TRUE, NOW(), NOW()),
-(32, 11, 'https://picsum.photos/id/24/200/200', FALSE, NOW(), NOW()),
-(33, 11, 'https://picsum.photos/id/25/200/200', FALSE, NOW(), NOW()),
+(31, 11, 'https://images.unsplash.com/photo-1585776245991-cf89dd7fc73a?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(32, 11, 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(33, 11, 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 12 (Anker Powerbank)
-(34, 12, 'https://picsum.photos/id/33/200/200', TRUE, NOW(), NOW()),
-(35, 12, 'https://picsum.photos/id/34/200/200', FALSE, NOW(), NOW()),
-(36, 12, 'https://picsum.photos/id/35/200/200', FALSE, NOW(), NOW()),
+(34, 12, 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(35, 12, 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(36, 12, 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 13 (Apple Cable)
-(37, 13, 'https://picsum.photos/id/43/200/200', TRUE, NOW(), NOW()),
-(38, 13, 'https://picsum.photos/id/44/200/200', FALSE, NOW(), NOW()),
-(39, 13, 'https://picsum.photos/id/45/200/200', FALSE, NOW(), NOW()),
+(37, 13, 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(38, 13, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(39, 13, 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 14 (Logitech Mouse)
-(40, 14, 'https://picsum.photos/id/53/200/200', TRUE, NOW(), NOW()),
-(41, 14, 'https://picsum.photos/id/54/200/200', FALSE, NOW(), NOW()),
-(42, 14, 'https://picsum.photos/id/55/200/200', FALSE, NOW(), NOW()),
+(40, 14, 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(41, 14, 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(42, 14, 'https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 15 (Keychron K2)
-(43, 15, 'https://picsum.photos/id/63/200/200', TRUE, NOW(), NOW()),
-(44, 15, 'https://picsum.photos/id/64/200/200', FALSE, NOW(), NOW()),
-(45, 15, 'https://picsum.photos/id/65/200/200', FALSE, NOW(), NOW()),
+(43, 15, 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(44, 15, 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(45, 15, 'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 16 (AirPods Pro 2)
-(46, 16, 'https://picsum.photos/id/73/200/200', TRUE, NOW(), NOW()),
-(47, 16, 'https://picsum.photos/id/74/200/200', FALSE, NOW(), NOW()),
-(48, 16, 'https://picsum.photos/id/75/200/200', FALSE, NOW(), NOW()),
+(46, 16, 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(47, 16, 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(48, 16, 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 17 (JBL Charge 5)
-(49, 17, 'https://picsum.photos/id/83/200/200', TRUE, NOW(), NOW()),
-(50, 17, 'https://picsum.photos/id/84/200/200', FALSE, NOW(), NOW()),
-(51, 17, 'https://picsum.photos/id/85/200/200', FALSE, NOW(), NOW()),
+(49, 17, 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(50, 17, 'https://images.unsplash.com/photo-1589003077984-894e133dabab?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(51, 17, 'https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 18 (Sony WH-1000XM5)
-(52, 18, 'https://picsum.photos/id/93/200/200', TRUE, NOW(), NOW()),
-(53, 18, 'https://picsum.photos/id/94/200/200', FALSE, NOW(), NOW()),
-(54, 18, 'https://picsum.photos/id/95/200/200', FALSE, NOW(), NOW()),
+(52, 18, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(53, 18, 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(54, 18, 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 19 (Marshall Acton III)
-(55, 19, 'https://picsum.photos/id/16/200/200', TRUE, NOW(), NOW()),
-(56, 19, 'https://picsum.photos/id/17/200/200', FALSE, NOW(), NOW()),
-(57, 19, 'https://picsum.photos/id/18/200/200', FALSE, NOW(), NOW()),
+(55, 19, 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(56, 19, 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(57, 19, 'https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
 
 -- Images for Product 20 (HyperX Cloud II)
-(58, 20, 'https://picsum.photos/id/26/200/200', TRUE, NOW(), NOW()),
-(59, 20, 'https://picsum.photos/id/27/200/200', FALSE, NOW(), NOW()),
-(60, 20, 'https://picsum.photos/id/28/200/200', FALSE, NOW(), NOW())
+(58, 20, 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&auto=format&fit=crop&q=80', TRUE, NOW(), NOW()),
+(59, 20, 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW()),
+(60, 20, 'https://images.unsplash.com/photo-1599669454699-248893623440?w=600&auto=format&fit=crop&q=80', FALSE, NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- =========================================================================
