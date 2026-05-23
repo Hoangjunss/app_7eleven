@@ -52,6 +52,7 @@ jobs:
     needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    environment: SSH_HOST
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
