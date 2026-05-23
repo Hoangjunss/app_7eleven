@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/services/productService";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,13 +26,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Image Section */}
         <div className="relative w-full aspect-square overflow-hidden rounded-t-xl bg-zinc-900 border-b border-white/5">
           {primaryImageUrl ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={primaryImageUrl}
               alt={name}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              priority={false}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full text-zinc-550 text-sm font-medium">
