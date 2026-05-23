@@ -1,0 +1,44 @@
+name: Production CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy to Production VPS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: GITHUB_TOKEN, GITHUB_ACTOR
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            # Kiểm tra xem các file cấu hình bắt buộc đã tồn tại chưa
+            if [ ! -f docker-compose.yml ]; then
+              echo "Lỗi: Không tìm thấy file docker-compose.yml trong thư mục ${{ secrets.DEPLOY_PATH }} trên VPS!"
+              echo "Vui lòng copy file cấu hình này lên server trước."
+              exit 1
+            fi
+            
+            if [ ! -f .env.prod ]; then
+              echo "Lỗi: Không tìm thấy file .env.prod trong thư mục ${{ secrets.DEPLOY_PATH }} trên VPS!"
+              echo "Vui lòng cấu hình các biến môi trường sản xuất trước khi deploy."
+              exit 1
+            fi
+            
+            # Đăng nhập GHCR và pull image mới
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+            docker compose pull
+            
+            # Chạy lại các container
+            docker compose up -d --remove-orphans
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
