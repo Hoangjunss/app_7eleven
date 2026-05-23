@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/uploads:/app/uploads
+
+  frontend:
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
