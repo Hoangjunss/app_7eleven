@@ -22,6 +22,7 @@ public class ProductRequest {
     @Size(max = 255, message = "Product name cannot exceed 255 characters")
     private String name;
 
+    @Size(max = 2000, message = "Description cannot exceed 2000 characters")
     private String description;
 
     @NotNull(message = "Price is required")
