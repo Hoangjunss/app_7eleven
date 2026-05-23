@@ -51,7 +51,7 @@ import { toast } from "sonner";
 const PAGE_SIZE = 10;
 
 export default function AdminUsersPage() {
-  const { user } = useAuthStore();
+  const { isAuthenticated, role, user } = useAuthStore();
   const currentUserEmail = user?.email;
 
   // States
