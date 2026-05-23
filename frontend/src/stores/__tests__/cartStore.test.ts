@@ -42,8 +42,8 @@ describe("useCartStore", () => {
 
   it("should sync cart items and compute quantity totals correctly", () => {
     const mockItems = [
-      { id: 1, productId: 10, productName: "Sữa tươi", price: 12000, quantity: 2, subtotal: 24000, imageUrl: "" },
-      { id: 2, productId: 22, productName: "Bánh mì", price: 15000, quantity: 1, subtotal: 15000, imageUrl: "" },
+      { id: 1, productId: 10, productName: "Sữa tươi", price: 12000, quantity: 2, subtotal: 24000, imageUrl: "", thumbnailUrl: "" },
+      { id: 2, productId: 22, productName: "Bánh mì", price: 15000, quantity: 1, subtotal: 15000, imageUrl: "", thumbnailUrl: "" },
     ];
 
     useCartStore.getState().syncCart(mockItems, 39000);
