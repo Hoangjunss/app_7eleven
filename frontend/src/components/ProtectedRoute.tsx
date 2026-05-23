@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
+import { toast } from "sonner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -27,6 +28,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     if (!isMounted) return;
 
     if (!isAuthenticated) {
+      toast.error("Vui lòng đăng nhập để truy cập trang này.");
       router.push("/login");
       return;
     }
@@ -34,6 +36,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     if (allowedRoles && allowedRoles.length > 0) {
       const hasAccess = allowedRoles.includes(role || "");
       if (!hasAccess) {
+        toast.error("Bạn không có quyền truy cập khu vực này.");
         router.push("/");
       }
     }
