@@ -37,7 +37,7 @@ Mục tiêu không phải là kiến trúc đẹp, mà là **chạy được tro
 | Refresh token | JWT 7 ngày access token đơn giản hơn, đủ an toàn cho MVP |
 | Multiple instances | 1 VPS, 1 instance, không cần load balancer phức tạp |
 | Blue-green deploy | Shell script `docker compose up -d` đủ rồi |
-| CI/CD pipeline | Script bash thủ công, không cần GitHub Actions |
+| CI/CD pipeline | Cấu hình tự động bằng GitHub Actions lên VPS |
 | Rate limiting phức tạp | Nginx basic rate limit hoặc bỏ luôn cho MVP |
 | AI recommendation | Không có data, không có thời gian |
 | Distributed tracing | Logs đơn giản đủ debug |
@@ -57,7 +57,7 @@ Mục tiêu không phải là kiến trúc đẹp, mà là **chạy được tro
 | **Auth** | JWT access token 7 ngày | Access + Refresh token, blacklist trên Redis |
 | **Rate limiting** | Không hoặc Nginx basic | Redis sliding window |
 | **Scale** | 1 instance, 1 VPS | Multi-instance, Nginx load balancer |
-| **Deploy** | Script bash + docker compose | GitHub Actions CI/CD, staging env |
+| **Deploy** | GitHub Actions CI/CD + Docker Compose | Staging env |
 | **Test** | Unit test service layer | Integration test, E2E Cypress |
 | **PDF invoice** | Không | iText/PDFBox, lưu S3 |
 | **AI** | Không | Recommendation, demand forecast |
@@ -451,18 +451,22 @@ services:
 
 **Lý do không có nhiều hơn:** 1 VPS, 1 người maintain. Scale sau khi có user thật.
 
-### 9.2 Deploy script
+### 9.2 CI/CD Pipeline (GitHub Actions)
 
-Không CI/CD pipeline. Chỉ cần:
-```
-# deploy.sh
-git pull origin main
-docker compose build backend frontend
-docker compose up -d
-docker compose logs -f backend
-```
+Quy trình tích hợp và triển khai liên tục (CI/CD) được cấu hình tự động thông qua GitHub Actions (file cấu hình `.github/workflows/cd-deploy.yml`):
+* **Trigger:** Chạy khi có push/merge hoặc pull request vào nhánh `main`.
+* **Job build-and-test:** 
+  * Backend: Biên dịch và chạy bộ test suite của Spring Boot bằng Maven.
+  * Frontend: Cài đặt packages và build Next.js (kiểm tra lỗi biên dịch TypeScript).
+* **Job deploy (chỉ chạy khi push/merge thành công vào main):**
+  * SSH kết nối trực tiếp đến production VPS qua cổng `24700`.
+  * Tự động cài đặt Docker, Docker Compose, Git trên VPS nếu chưa có.
+  * Clone repository lần đầu tiên (nếu chưa tồn tại) hoặc stash thay đổi cục bộ và pull/reset code mới nhất về nhánh `main`.
+  * Ghi đè cấu hình bảo mật `.env.prod` từ GitHub Secrets.
+  * Triển khai lại toàn bộ container bằng `docker compose up --build -d`.
+  * Thực hiện Healthcheck đếm số container ở trạng thái `healthy`, nếu có container lỗi sẽ đánh dấu deploy thất bại.
+  * Giải phóng bộ nhớ đệm Docker build thừa trên VPS.
 
-Chạy tay khi cần deploy. Downtime < 30s là chấp nhận được ở giai đoạn MVP.
 
 ### 9.3 Secrets management
 
