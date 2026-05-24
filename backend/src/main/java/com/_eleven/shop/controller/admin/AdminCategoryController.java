@@ -1,10 +1,10 @@
 package com._eleven.shop.controller.admin;
 
 import com._eleven.shop.aspect.Auditable;
-import com._eleven.shop.dto.ApiResponse;
-import com._eleven.shop.dto.CategoryRequest;
-import com._eleven.shop.dto.CategoryResponse;
-import com._eleven.shop.service.CategoryService;
+import com._eleven.shop.dto.common.ApiResponse;
+import com._eleven.shop.dto.category.CategoryRequest;
+import com._eleven.shop.dto.category.CategoryResponse;
+import com._eleven.shop.service.category.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

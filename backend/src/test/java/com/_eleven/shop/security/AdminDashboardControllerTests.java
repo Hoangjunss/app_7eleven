@@ -1,15 +1,15 @@
 package com._eleven.shop.security;
 
 import com._eleven.shop.controller.admin.AdminDashboardController;
-import com._eleven.shop.dto.DashboardKpiResponse;
-import com._eleven.shop.dto.OrderResponse;
-import com._eleven.shop.dto.RevenueChartResponse;
-import com._eleven.shop.dto.TopProductResponse;
-import com._eleven.shop.repository.AuditLogRepository;
-import com._eleven.shop.repository.RoleRepository;
-import com._eleven.shop.repository.UserRepository;
-import com._eleven.shop.service.AuditLogService;
-import com._eleven.shop.service.DashboardService;
+import com._eleven.shop.dto.dashboard.DashboardKpiResponse;
+import com._eleven.shop.dto.order.OrderResponse;
+import com._eleven.shop.dto.dashboard.RevenueChartResponse;
+import com._eleven.shop.dto.dashboard.TopProductResponse;
+import com._eleven.shop.repository.audit.AuditLogRepository;
+import com._eleven.shop.repository.user.RoleRepository;
+import com._eleven.shop.repository.user.UserRepository;
+import com._eleven.shop.service.audit.AuditLogService;
+import com._eleven.shop.service.dashboard.DashboardService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

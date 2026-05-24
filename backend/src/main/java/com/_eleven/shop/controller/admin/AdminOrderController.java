@@ -1,10 +1,10 @@
 package com._eleven.shop.controller.admin;
 
 import com._eleven.shop.aspect.Auditable;
-import com._eleven.shop.dto.ApiResponse;
-import com._eleven.shop.dto.OrderResponse;
+import com._eleven.shop.dto.common.ApiResponse;
+import com._eleven.shop.dto.order.OrderResponse;
 import com._eleven.shop.entity.OrderStatus;
-import com._eleven.shop.service.OrderService;
+import com._eleven.shop.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

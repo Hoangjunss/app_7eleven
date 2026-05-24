@@ -1,10 +1,10 @@
 package com._eleven.shop.controller.admin;
 
 import com._eleven.shop.aspect.Auditable;
-import com._eleven.shop.dto.ApiResponse;
-import com._eleven.shop.dto.UpdateRolesRequest;
-import com._eleven.shop.dto.UserResponse;
-import com._eleven.shop.service.UserService;
+import com._eleven.shop.dto.common.ApiResponse;
+import com._eleven.shop.dto.user.UpdateRolesRequest;
+import com._eleven.shop.dto.user.UserResponse;
+import com._eleven.shop.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

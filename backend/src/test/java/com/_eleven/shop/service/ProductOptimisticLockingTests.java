@@ -2,8 +2,8 @@ package com._eleven.shop.service;
 
 import com._eleven.shop.entity.Category;
 import com._eleven.shop.entity.Product;
-import com._eleven.shop.repository.CategoryRepository;
-import com._eleven.shop.repository.ProductRepository;
+import com._eleven.shop.repository.category.CategoryRepository;
+import com._eleven.shop.repository.product.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

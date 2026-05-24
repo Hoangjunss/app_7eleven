@@ -1,7 +1,7 @@
 package com._eleven.shop.security;
 
 import com._eleven.shop.entity.User;
-import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
