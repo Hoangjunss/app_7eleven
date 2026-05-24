@@ -55,21 +55,21 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         // 1. Check if user exists (including soft deleted/locked users)
         User user = userRepository.findByEmailWithDeleted(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống"));
+                .orElseThrow(() -> new IllegalArgumentException("Email not found in the system"));
 
         // 2. Check if user is soft deleted (hidden completely)
         if (user.isDeleted()) {
-            throw new IllegalArgumentException("Email không tồn tại trong hệ thống");
+            throw new IllegalArgumentException("Email not found in the system");
         }
 
         // 3. Check if user account is locked
         if (user.isLocked()) {
-            throw new IllegalArgumentException("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên để được hỗ trợ.");
+            throw new IllegalArgumentException("Account is locked. Please contact administrator for support.");
         }
 
         // 3. Verify password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Mật khẩu không chính xác, vui lòng thử lại");
+            throw new IllegalArgumentException("Incorrect password, please try again");
         }
 
         Authentication authentication = authenticationManager.authenticate(
