@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Package, FolderTree, ClipboardList, Users, LayoutDashboard } from "lucide-react";
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
 
   const menuItems = [
@@ -43,7 +43,7 @@ export default function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-64 shrink-0 border-r border-white/10 bg-[#09090b]/40 backdrop-blur-md min-h-[calc(100vh-69px)] flex flex-col p-4 space-y-2">
+    <aside className={cn("w-64 shrink-0 border-r border-white/10 bg-[#09090b]/40 backdrop-blur-md min-h-[calc(100vh-69px)] flex flex-col p-4 space-y-2", className)}>
       <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
         Management Menu
       </div>
