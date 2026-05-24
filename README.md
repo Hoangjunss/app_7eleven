@@ -66,11 +66,11 @@ Hệ thống tuân thủ nghiêm ngặt các quy tắc ràng buộc công nghệ
 
 ---
 
-## 🖥️ Chi Tiết 16 Màn Hình Ứng Dụng (Giao Giao Diện Frontend)
+## 🖥️ Chi Tiết 15 Màn Hình Ứng Dụng (Giao Giao Diện Frontend)
 
-Hệ thống Next.js được xây dựng hoàn chỉnh với **đúng 16 màn hình chức năng** (không tính các file redirect điều hướng thuần túy):
+Hệ thống Next.js được xây dựng hoàn chỉnh với **đúng 15 màn hình chức năng** (không tính các file redirect điều hướng thuần túy):
 
-### A. Nhóm Màn Hình Khách Hàng (Customer - 10 Màn Hình)
+### A. Nhóm Màn Hình Khách Hàng (Customer - 9 Màn Hình)
 
 1.  **Trang Chủ / Tìm Kiếm Sản Phẩm (`/`)**:
     *   Giao diện danh sách sản phẩm với các bộ lọc thông minh (theo danh mục, khoảng giá từ thấp đến cao, tìm kiếm từ khóa).
@@ -92,31 +92,29 @@ Hệ thống Next.js được xây dựng hoàn chỉnh với **đúng 16 màn h
 7.  **Trang Chi Tiết Đơn Hàng (`/orders/[id]`)**:
     *   Xem chi tiết từng mặt hàng đã đặt, thông tin người nhận, trạng thái thanh toán và lịch sử giao nhận.
     *   Tích hợp nút **"Hủy đơn hàng"** trực tiếp nếu đơn hàng đang ở trạng thái `PENDING`.
-8.  **Trang Hồ Sơ Cá Nhân (`/profile`)**:
-    *   Hiển thị và cập nhật thông tin cá nhân của người dùng (Họ tên, email, số điện thoại).
-9.  **Trang Đăng Nhập (`/login`)**:
+8.  **Trang Đăng Nhập (`/login`)**:
     *   Form đăng nhập sử dụng email và mật khẩu. Tự động kiểm tra quyền hạn (Role) để điều hướng Admin vào trang quản trị hoặc User vào trang mua sắm.
-10. **Trang Đăng Ký (`/register`)**:
+9.  **Trang Đăng Ký (`/register`)**:
     *   Màn hình tạo tài khoản khách hàng mới với các bước xác thực dữ liệu đầu vào phía Client (JSR-380 tương ứng ở backend).
 
 ### B. Nhóm Màn Hình Quản Trị (Admin - 6 Màn Hình)
 
-11. **Bảng Thống Kê KPI & Doanh Thu (`/admin/dashboard`)**:
+10. **Bảng Thống Kê KPI & Doanh Thu (`/admin/dashboard`)**:
     *   Bảng điều khiển trung tâm hiển thị các thẻ KPI (Tổng doanh thu đơn giao thành công, số lượng đơn hàng, số sản phẩm đang bán, số người dùng).
     *   Biểu đồ cột/đường xu hướng doanh thu từng ngày và biểu đồ tròn thể hiện cơ cấu trạng thái đơn hàng thông qua Recharts.
-12. **Quản Lý Danh Mục Sản Phẩm (`/admin/categories`)**:
+11. **Quản Lý Danh Mục Sản Phẩm (`/admin/categories`)**:
     *   Màn hình hiển thị danh sách các phân loại sản phẩm dưới dạng bảng.
     *   Hỗ trợ Thêm mới danh mục, Sửa tên/mô tả và Xóa danh mục (có cơ chế kiểm tra chặn xóa nếu danh mục đang chứa sản phẩm).
-13. **Quản Lý Sản Phẩm (`/admin/products`)**:
+12. **Quản Lý Sản Phẩm (`/admin/products`)**:
     *   Bảng quản trị sản phẩm tích hợp tìm kiếm và hiển thị tồn kho.
     *   Hỗ trợ thêm mới hoặc cập nhật sản phẩm bằng Form dữ liệu phức tạp (Multipart-form) cho phép chọn và upload ảnh trực tiếp lên Cloudinary. Xóa mềm sản phẩm (Soft Delete).
-14. **Quản Lý Danh Sách Đơn Hàng (`/admin/orders`)**:
+13. **Quản Lý Danh Sách Đơn Hàng (`/admin/orders`)**:
     *   Bảng quản trị đơn hàng toàn hệ thống, hỗ trợ lọc trạng thái và phân trang.
     *   Giúp admin theo dõi nhanh doanh số giao hàng và tìm kiếm đơn hàng theo mã.
-15. **Chi Tiết Đơn Hàng & Cập Nhật Trạng Thái (`/admin/orders/[id]`)**:
+14. **Chi Tiết Đơn Hàng & Cập Nhật Trạng Thái (`/admin/orders/[id]`)**:
     *   Hiển thị chi tiết thông tin và danh sách mặt hàng của đơn hàng.
     *   Chứa **Dropdown cập nhật trạng thái đơn hàng** (tuân thủ nghiêm ngặt máy trạng thái chuyển đổi đơn: `PENDING` -> `CONFIRMED` -> `SHIPPING` -> `DELIVERED`).
-16. **Quản Lý Quyền Người Dùng (`/admin/users`)**:
+15. **Quản Lý Quyền Người Dùng (`/admin/users`)**:
     *   Bảng hiển thị toàn bộ người dùng đăng ký trên hệ thống.
     *   Cho phép Admin điều chỉnh vai trò (`Role`) từ `USER` sang `ADMIN` hoặc ngược lại và khóa/kích hoạt tài khoản.
 
