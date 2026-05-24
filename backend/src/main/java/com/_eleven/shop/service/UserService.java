@@ -26,6 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(String search, String status, int page, int size, String direction) {
@@ -133,5 +134,27 @@ public class UserService {
                 .deleted(user.isDeleted())
                 .locked(user.isLocked())
                 .build();
+    }
+
+    @Transactional
+    public UserResponse updateProfile(String email, com._eleven.shop.dto.UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setFullName(request.getFullName());
+        User updatedUser = userRepository.save(user);
+        return toResponse(updatedUser);
+    }
+
+    @Transactional
+    public void changePassword(String email, com._eleven.shop.dto.ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password, please try again");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

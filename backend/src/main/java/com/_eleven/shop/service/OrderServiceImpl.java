@@ -14,6 +14,7 @@ import com._eleven.shop.repository.ProductRepository;
 import com._eleven.shop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -45,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @CacheEvict(value = { "revenueStats", "orderStats", "topProductsMonth", "categoryRevenue", "noOrderProducts" }, allEntries = true)
     public OrderResponse createOrder(Long userId, OrderRequest request) {
         // 1. Get user cart
         CartResponse cart = cartService.getCart(userId);
@@ -150,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @CacheEvict(value = { "revenueStats", "orderStats", "topProductsMonth", "categoryRevenue", "noOrderProducts" }, allEntries = true)
     public void cancelOrder(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
@@ -202,6 +205,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @CacheEvict(value = { "revenueStats", "orderStats", "topProductsMonth", "categoryRevenue", "noOrderProducts" }, allEntries = true)
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
