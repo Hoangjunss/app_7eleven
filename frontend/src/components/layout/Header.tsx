@@ -175,15 +175,7 @@ export default function Header() {
                       <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
                       Bảng điều khiển
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      render={
-                        <Link href="/profile" className="flex w-full items-center gap-2" />
-                      }
-                      className="hover:bg-white/5 cursor-pointer"
-                    >
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      Profile Settings
-                    </DropdownMenuItem>
+
                     {role === "ADMIN" && (
                       <DropdownMenuItem
                         render={
