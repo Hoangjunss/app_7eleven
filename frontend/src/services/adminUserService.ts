@@ -9,12 +9,16 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  deleted: boolean;
+  locked: boolean;
 }
 
 export interface AdminGetUsersParams {
   page?: number;
   size?: number;
   search?: string;
+  status?: string;
+  direction?: string;
 }
 
 export const adminUserService = {
@@ -24,6 +28,8 @@ export const adminUserService = {
         page: params.page ?? 0,
         size: params.size ?? 10,
         search: params.search || "",
+        status: params.status || "all",
+        direction: params.direction || "desc",
       },
     });
     return response.data;

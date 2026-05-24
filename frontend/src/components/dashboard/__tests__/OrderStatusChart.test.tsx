@@ -5,7 +5,6 @@ import { DashboardKpi } from "@/services/adminDashboardService";
 
 // Mock recharts because ResponsiveContainer needs custom sizing that doesn't exist in JSDOM
 jest.mock("recharts", () => {
-  const React = require("react");
   return {
     ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
     PieChart: ({ children }: any) => <div data-testid="pie-chart">{children}</div>,
@@ -31,7 +30,7 @@ describe("OrderStatusChart Component", () => {
 
   it("should render loading placeholder when isLoading is true", () => {
     render(<OrderStatusChart kpi={undefined} isLoading={true} />);
-    expect(screen.getByText("Đang tải dữ liệu biểu đồ...")).toBeInTheDocument();
+    expect(screen.getByText("Đang tải dữ liệu...")).toBeInTheDocument();
   });
 
   it("should render empty state message when there are no orders with count > 0", () => {

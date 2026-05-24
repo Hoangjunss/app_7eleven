@@ -35,6 +35,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse createProduct(ProductRequest request, MultipartFile[] images, Integer primaryImageIndex) {
+        if (productRepository.existsByNameIgnoreCaseAndTrimmed(request.getName())) {
+            throw new IllegalArgumentException("Tên sản phẩm này đã tồn tại trong hệ thống");
+        }
+
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
@@ -57,6 +61,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (productRepository.existsByNameIgnoreCaseAndTrimmedForUpdate(request.getName(), id)) {
+            throw new IllegalArgumentException("Tên sản phẩm này đã tồn tại trong hệ thống");
+        }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));

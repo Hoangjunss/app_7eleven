@@ -41,10 +41,10 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success("Logged out successfully");
+      toast.success("Đăng xuất thành công!");
       router.push("/login");
     } catch {
-      toast.error("Logout failed");
+      toast.error("Đăng xuất thất bại");
     }
   };
 
@@ -73,7 +73,7 @@ export default function Header() {
       <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#09090b]/80 py-4 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Left Side: Brand Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href={isAdminPage ? "/admin/dashboard" : "/"} className="flex items-center gap-2 group">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-black italic text-white transition-all duration-300 group-hover:scale-105">
               7E
             </div>
@@ -103,14 +103,14 @@ export default function Header() {
             {isAuthenticated && user ? (
               <div className="flex items-center gap-2">
                 {role === "ADMIN" && (
-                  <Link href="/admin/products">
+                  <Link href={isAdminPage ? "/" : "/admin/dashboard"}>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="hidden sm:flex items-center gap-1.5 text-white/80 hover:text-white hover:bg-white/5"
                     >
                       <LayoutDashboard className="h-4 w-4 text-primary" />
-                      Admin Panel
+                      {isAdminPage ? "User Panel" : "Admin Panel"}
                     </Button>
                   </Link>
                 )}
@@ -178,12 +178,12 @@ export default function Header() {
                     {role === "ADMIN" && (
                       <DropdownMenuItem
                         render={
-                          <Link href="/admin/products" className="flex w-full items-center gap-2" />
+                          <Link href={isAdminPage ? "/" : "/admin/dashboard"} className="flex w-full items-center gap-2" />
                         }
                         className="hover:bg-white/5 cursor-pointer sm:hidden"
                       >
                         <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                        Admin Dashboard
+                        {isAdminPage ? "User Panel" : "Admin Panel"}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator className="bg-white/10" />

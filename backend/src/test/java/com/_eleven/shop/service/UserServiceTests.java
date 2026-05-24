@@ -73,7 +73,7 @@ public class UserServiceTests {
 
         userService.lockUser(2L);
 
-        assertNotNull(other.getDeletedAt());
+        assertTrue(other.isLocked());
         verify(userRepository).save(other);
     }
 

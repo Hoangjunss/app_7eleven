@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import { useDashboardKpi, useDashboardRevenue, useDashboardTopProducts, useDashboardRecentOrders } from "@/hooks/useAdminDashboard";
 import KpiCards from "@/components/dashboard/KpiCards";
 import RevenueChart from "@/components/dashboard/RevenueChart";

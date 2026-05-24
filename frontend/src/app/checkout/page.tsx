@@ -37,13 +37,16 @@ import { Textarea } from "@/components/ui/textarea";
 const checkoutSchema = z.object({
   recipientName: z
     .string()
+    .min(1, "Vui lòng điền đầy đủ thông tin: Họ và tên người nhận")
     .min(2, "Tên phải có ít nhất 2 ký tự")
     .max(255, "Tên tối đa 255 ký tự"),
   recipientPhone: z
     .string()
+    .min(1, "Vui lòng điền đầy đủ thông tin: Số điện thoại")
     .regex(/^[0-9]{9,11}$/, "Số điện thoại không hợp lệ (9–11 chữ số)"),
   deliveryAddress: z
     .string()
+    .min(1, "Vui lòng điền đầy đủ thông tin: Địa chỉ giao hàng")
     .min(10, "Địa chỉ phải có ít nhất 10 ký tự"),
   note: z.string().max(500, "Ghi chú tối đa 500 ký tự").optional(),
 });
