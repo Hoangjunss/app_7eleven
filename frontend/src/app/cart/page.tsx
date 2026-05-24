@@ -107,6 +107,7 @@ function CartItemRow({ item, onUpdate, onRemove, disabled }: CartItemRowProps) {
               <Plus className="h-3 w-3" />
             </button>
           </div>
+          {disabled && <Loader2 className="h-3.5 w-3.5 text-primary animate-spin" />}
 
           <button
             disabled={disabled}

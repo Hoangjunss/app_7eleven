@@ -17,25 +17,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-function ProductSkeletonGrid() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-4 h-[380px]">
-          <Skeleton className="w-full aspect-square rounded-lg bg-white/10" />
-          <div className="flex flex-col gap-2 flex-grow">
-            <Skeleton className="h-4 w-1/3 bg-white/10" />
-            <Skeleton className="h-6 w-full bg-white/10" />
-          </div>
-          <div className="flex justify-between items-center mt-auto">
-            <Skeleton className="h-6 w-24 bg-white/10" />
-            <Skeleton className="h-8 w-24 bg-white/10" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function ProductDirectoryClient() {
   const router = useRouter();
@@ -132,7 +113,7 @@ export default function ProductDirectoryClient() {
       {/* Main product area */}
       <div className="flex-1 flex flex-col gap-8">
         {isLoading ? (
-          <ProductSkeletonGrid />
+          <ProductGrid products={[]} isLoading={true} limit={size} />
         ) : isError ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 rounded-xl border border-red-500/20 bg-red-500/5 text-center">
             <p className="text-red-400 font-medium mb-4">Đã xảy ra lỗi khi tải danh sách sản phẩm.</p>
@@ -154,9 +135,7 @@ export default function ProductDirectoryClient() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => {
                         if (currentPage > 0) handlePageChange(currentPage - 1);
                       }}
                       className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
@@ -172,12 +151,8 @@ export default function ProductDirectoryClient() {
                       return (
                         <PaginationItem key={idx}>
                           <PaginationLink
-                            href="#"
                             isActive={idx === currentPage}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handlePageChange(idx);
-                            }}
+                            onClick={() => handlePageChange(idx)}
                             className="cursor-pointer"
                           >
                             {idx + 1}
@@ -209,9 +184,7 @@ export default function ProductDirectoryClient() {
 
                   <PaginationItem>
                     <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => {
                         if (currentPage < totalPages - 1) handlePageChange(currentPage + 1);
                       }}
                       className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
