@@ -1,12 +1,13 @@
 package com._eleven.shop.service;
+import com._eleven.shop.service.user.UserService;
 
-import com._eleven.shop.dto.UpdateRolesRequest;
-import com._eleven.shop.dto.UserResponse;
+import com._eleven.shop.dto.user.UpdateRolesRequest;
+import com._eleven.shop.dto.user.UserResponse;
 import com._eleven.shop.entity.Role;
 import com._eleven.shop.entity.User;
 import com._eleven.shop.exception.ResourceNotFoundException;
-import com._eleven.shop.repository.RoleRepository;
-import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.repository.user.RoleRepository;
+import com._eleven.shop.repository.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,8 @@
 package com._eleven.shop.exception;
 
-import com._eleven.shop.dto.ApiResponse;
+import com._eleven.shop.common.constant.MessageConstants;
+
+import com._eleven.shop.dto.common.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,7 +34,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
-        ApiResponse<Void> response = ApiResponse.error("Invalid email or password", HttpStatus.UNAUTHORIZED.value());
+        ApiResponse<Void> response = ApiResponse.error(MessageConstants.LOGIN_FAILED, HttpStatus.UNAUTHORIZED.value());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
@@ -69,7 +71,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
         log.error("Internal Server Error: ", ex);
-        ApiResponse<Void> response = ApiResponse.error("Đã có lỗi xảy ra, vui lòng thử lại sau", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        ApiResponse<Void> response = ApiResponse.error(MessageConstants.INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

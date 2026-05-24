@@ -1,7 +1,14 @@
 package com._eleven.shop.controller.admin;
 
-import com._eleven.shop.dto.*;
-import com._eleven.shop.service.DashboardService;
+import com._eleven.shop.dto.common.*;
+import com._eleven.shop.dto.auth.*;
+import com._eleven.shop.dto.product.*;
+import com._eleven.shop.dto.order.*;
+import com._eleven.shop.dto.user.*;
+import com._eleven.shop.dto.category.*;
+import com._eleven.shop.dto.cart.*;
+import com._eleven.shop.dto.dashboard.*;
+import com._eleven.shop.service.dashboard.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;

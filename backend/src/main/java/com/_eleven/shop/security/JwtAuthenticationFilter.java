@@ -1,6 +1,6 @@
 package com._eleven.shop.security;
 
-import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.repository.user.UserRepository;
 import com._eleven.shop.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

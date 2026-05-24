@@ -1,12 +1,15 @@
 package com._eleven.shop.service;
 
-import com._eleven.shop.dto.AuthResponse;
-import com._eleven.shop.dto.LoginRequest;
-import com._eleven.shop.dto.RegisterRequest;
+import com._eleven.shop.common.constant.MessageConstants;
+import com._eleven.shop.service.auth.AuthService;
+
+import com._eleven.shop.dto.auth.AuthResponse;
+import com._eleven.shop.dto.auth.LoginRequest;
+import com._eleven.shop.dto.auth.RegisterRequest;
 import com._eleven.shop.entity.Role;
 import com._eleven.shop.entity.User;
-import com._eleven.shop.repository.RoleRepository;
-import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.repository.user.RoleRepository;
+import com._eleven.shop.repository.user.UserRepository;
 import com._eleven.shop.security.JwtProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,7 +87,7 @@ public class AuthServiceTests {
             authService.register(request);
         });
 
-        assertEquals("Email is already taken", exception.getMessage());
+        assertEquals(MessageConstants.EMAIL_TAKEN, exception.getMessage());
     }
 
     @Test
@@ -106,7 +109,7 @@ public class AuthServiceTests {
             authService.register(request);
         });
 
-        assertEquals("Email is already taken", exception.getMessage());
+        assertEquals(MessageConstants.EMAIL_TAKEN, exception.getMessage());
     }
 
     @Test
@@ -157,7 +160,7 @@ public class AuthServiceTests {
             authService.login(request);
         });
 
-        assertEquals("Email not found in the system", exception.getMessage());
+        assertEquals(MessageConstants.LOGIN_FAILED, exception.getMessage());
     }
 
     @Test
@@ -178,7 +181,7 @@ public class AuthServiceTests {
             authService.login(request);
         });
 
-        assertEquals("Email not found in the system", exception.getMessage());
+        assertEquals(MessageConstants.LOGIN_FAILED, exception.getMessage());
     }
 
     @Test
@@ -200,7 +203,7 @@ public class AuthServiceTests {
             authService.login(request);
         });
 
-        assertEquals("Account is locked. Please contact administrator for support.", exception.getMessage());
+        assertEquals(MessageConstants.ACCOUNT_LOCKED, exception.getMessage());
     }
 
     @Test
@@ -224,6 +227,6 @@ public class AuthServiceTests {
             authService.login(request);
         });
 
-        assertEquals("Incorrect password, please try again", exception.getMessage());
+        assertEquals(MessageConstants.WRONG_PASSWORD, exception.getMessage());
     }
 }

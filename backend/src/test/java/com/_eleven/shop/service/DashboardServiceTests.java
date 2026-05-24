@@ -1,18 +1,25 @@
 package com._eleven.shop.service;
+import com._eleven.shop.dto.dashboard.RevenueDashboardResponse;
+import com._eleven.shop.dto.dashboard.CategoryRevenueResponse;
+import com._eleven.shop.dto.dashboard.UserStatsResponse;
+import com._eleven.shop.dto.dashboard.OrderStatsResponse;
+import com._eleven.shop.dto.product.ProductResponse;
+import com._eleven.shop.mapper.product.ProductMapper;
+import com._eleven.shop.service.dashboard.DashboardServiceImpl;
 
-import com._eleven.shop.dto.DashboardKpiResponse;
-import com._eleven.shop.dto.OrderResponse;
-import com._eleven.shop.dto.RevenueChartResponse;
-import com._eleven.shop.dto.TopProductResponse;
+import com._eleven.shop.dto.dashboard.DashboardKpiResponse;
+import com._eleven.shop.dto.order.OrderResponse;
+import com._eleven.shop.dto.dashboard.RevenueChartResponse;
+import com._eleven.shop.dto.dashboard.TopProductResponse;
 import com._eleven.shop.entity.Order;
 import com._eleven.shop.entity.OrderItem;
 import com._eleven.shop.entity.OrderStatus;
 import com._eleven.shop.entity.User;
 import java.util.Optional;
-import com._eleven.shop.repository.OrderItemRepository;
-import com._eleven.shop.repository.OrderRepository;
-import com._eleven.shop.repository.ProductRepository;
-import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.repository.order.OrderItemRepository;
+import com._eleven.shop.repository.order.OrderRepository;
+import com._eleven.shop.repository.product.ProductRepository;
+import com._eleven.shop.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,7 +56,7 @@ public class DashboardServiceTests {
     private UserRepository userRepository;
 
     @Mock
-    private com._eleven.shop.mapper.ProductMapper productMapper;
+    private com._eleven.shop.mapper.product.ProductMapper productMapper;
 
     @InjectMocks
     private DashboardServiceImpl dashboardService;
@@ -173,7 +180,7 @@ public class DashboardServiceTests {
         List<Object[]> mockChartData = new ArrayList<>();
         when(orderRepository.findRevenueChartData(OrderStatus.DELIVERED, start, end)).thenReturn(mockChartData);
 
-        com._eleven.shop.dto.RevenueDashboardResponse response = dashboardService.getRevenueStats(start, end);
+        com._eleven.shop.dto.dashboard.RevenueDashboardResponse response = dashboardService.getRevenueStats(start, end);
 
         assertNotNull(response);
         assertEquals(new BigDecimal("10000"), response.getTotalRevenue());
@@ -196,7 +203,7 @@ public class DashboardServiceTests {
         when(orderRepository.countOrdersByStatusBetween(start, end)).thenReturn(currentCounts);
         when(orderRepository.countOrdersByStatusBetween(prevStart, start)).thenReturn(prevCounts);
 
-        com._eleven.shop.dto.OrderStatsResponse response = dashboardService.getOrderStats(start, end);
+        com._eleven.shop.dto.dashboard.OrderStatsResponse response = dashboardService.getOrderStats(start, end);
 
         assertNotNull(response);
         assertEquals(10, response.getTotalOrders());
@@ -220,12 +227,12 @@ public class DashboardServiceTests {
     @Test
     void testGetLowStockProducts() {
         com._eleven.shop.entity.Product product = com._eleven.shop.entity.Product.builder().id(1L).name("P1").build();
-        com._eleven.shop.dto.ProductResponse response = com._eleven.shop.dto.ProductResponse.builder().id(1L).name("P1").build();
+        com._eleven.shop.dto.product.ProductResponse response = com._eleven.shop.dto.product.ProductResponse.builder().id(1L).name("P1").build();
 
         when(productRepository.findLowStockProducts(PageRequest.of(0, 10))).thenReturn(List.of(product));
         when(productMapper.toResponse(product)).thenReturn(response);
 
-        List<com._eleven.shop.dto.ProductResponse> result = dashboardService.getLowStockProducts();
+        List<com._eleven.shop.dto.product.ProductResponse> result = dashboardService.getLowStockProducts();
         assertEquals(1, result.size());
         assertEquals("P1", result.get(0).getName());
     }
@@ -233,12 +240,12 @@ public class DashboardServiceTests {
     @Test
     void testGetNoOrderProducts30Days() {
         com._eleven.shop.entity.Product product = com._eleven.shop.entity.Product.builder().id(1L).name("P2").build();
-        com._eleven.shop.dto.ProductResponse response = com._eleven.shop.dto.ProductResponse.builder().id(1L).name("P2").build();
+        com._eleven.shop.dto.product.ProductResponse response = com._eleven.shop.dto.product.ProductResponse.builder().id(1L).name("P2").build();
 
         when(productRepository.findProductsWithNoOrdersSince(any(), eq(PageRequest.of(0, 10)))).thenReturn(List.of(product));
         when(productMapper.toResponse(product)).thenReturn(response);
 
-        List<com._eleven.shop.dto.ProductResponse> result = dashboardService.getNoOrderProducts30Days();
+        List<com._eleven.shop.dto.product.ProductResponse> result = dashboardService.getNoOrderProducts30Days();
         assertEquals(1, result.size());
         assertEquals("P2", result.get(0).getName());
     }
@@ -256,7 +263,7 @@ public class DashboardServiceTests {
         registrations.add(new Object[]{LocalDate.now(), 4L});
         when(userRepository.findUserRegistrationsChart(start, end)).thenReturn(registrations);
 
-        com._eleven.shop.dto.UserStatsResponse response = dashboardService.getUserStats(start, end);
+        com._eleven.shop.dto.dashboard.UserStatsResponse response = dashboardService.getUserStats(start, end);
 
         assertNotNull(response);
         assertEquals(100L, response.getTotalUsers());
@@ -267,12 +274,12 @@ public class DashboardServiceTests {
 
     @Test
     void testGetCategoryRevenues() {
-        List<com._eleven.shop.dto.CategoryRevenueResponse> mockRevenues = List.of(
-                new com._eleven.shop.dto.CategoryRevenueResponse(1L, "Category A", new BigDecimal("1000"))
+        List<com._eleven.shop.dto.dashboard.CategoryRevenueResponse> mockRevenues = List.of(
+                new com._eleven.shop.dto.dashboard.CategoryRevenueResponse(1L, "Category A", new BigDecimal("1000"))
         );
         when(orderItemRepository.findCategoryRevenueBetween(any(), any())).thenReturn(mockRevenues);
 
-        List<com._eleven.shop.dto.CategoryRevenueResponse> result = dashboardService.getCategoryRevenues(OffsetDateTime.now().minusDays(1), OffsetDateTime.now());
+        List<com._eleven.shop.dto.dashboard.CategoryRevenueResponse> result = dashboardService.getCategoryRevenues(OffsetDateTime.now().minusDays(1), OffsetDateTime.now());
         assertEquals(1, result.size());
         assertEquals("Category A", result.get(0).getCategoryName());
     }
@@ -329,10 +336,10 @@ public class DashboardServiceTests {
 
         when(productMapper.toResponse(any(com._eleven.shop.entity.Product.class))).thenAnswer(invocation -> {
             com._eleven.shop.entity.Product p = invocation.getArgument(0);
-            return com._eleven.shop.dto.ProductResponse.builder().id(p.getId()).name(p.getName()).build();
+            return com._eleven.shop.dto.product.ProductResponse.builder().id(p.getId()).name(p.getName()).build();
         });
 
-        List<com._eleven.shop.dto.ProductResponse> result = dashboardService.getProductSuggestionsForUser(1L);
+        List<com._eleven.shop.dto.product.ProductResponse> result = dashboardService.getProductSuggestionsForUser(1L);
         assertEquals(5, result.size());
     }
 }

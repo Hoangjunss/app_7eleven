@@ -1,6 +1,6 @@
 package com._eleven.shop.controller.admin;
 
-import com._eleven.shop.dto.ApiResponse;
+import com._eleven.shop.dto.common.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

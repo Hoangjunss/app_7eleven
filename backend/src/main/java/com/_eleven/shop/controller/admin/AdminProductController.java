@@ -1,10 +1,10 @@
 package com._eleven.shop.controller.admin;
 
 import com._eleven.shop.aspect.Auditable;
-import com._eleven.shop.dto.ApiResponse;
-import com._eleven.shop.dto.ProductRequest;
-import com._eleven.shop.dto.ProductResponse;
-import com._eleven.shop.service.ProductService;
+import com._eleven.shop.dto.common.ApiResponse;
+import com._eleven.shop.dto.product.ProductRequest;
+import com._eleven.shop.dto.product.ProductResponse;
+import com._eleven.shop.service.product.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

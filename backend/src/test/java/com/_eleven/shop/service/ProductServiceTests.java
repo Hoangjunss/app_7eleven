@@ -1,13 +1,14 @@
 package com._eleven.shop.service;
+import com._eleven.shop.service.product.ProductServiceImpl;
 
-import com._eleven.shop.dto.ProductRequest;
-import com._eleven.shop.dto.ProductResponse;
+import com._eleven.shop.dto.product.ProductRequest;
+import com._eleven.shop.dto.product.ProductResponse;
 import com._eleven.shop.entity.Category;
 import com._eleven.shop.entity.Product;
 import com._eleven.shop.exception.ResourceNotFoundException;
-import com._eleven.shop.mapper.ProductMapper;
-import com._eleven.shop.repository.CategoryRepository;
-import com._eleven.shop.repository.ProductRepository;
+import com._eleven.shop.mapper.product.ProductMapper;
+import com._eleven.shop.repository.category.CategoryRepository;
+import com._eleven.shop.repository.product.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
