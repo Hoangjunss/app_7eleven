@@ -26,6 +26,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getAllUsers(String search, String status, int page, int size, String direction) {
@@ -46,13 +47,17 @@ public class UserService {
     @Transactional
     public UserResponse updateRoles(Long id, UpdateRolesRequest request) {
         User user = userRepository.findByIdWithDeleted(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.isDeleted()) {
+            throw new ResourceNotFoundException("User not found");
+        }
 
         // Self-role-demotion prevention check
         String currentUserEmail = getCurrentUserEmail();
         boolean wantsAdmin = request.getRoles().stream().anyMatch(roleName -> roleName.equals("ADMIN"));
         if (user.getEmail().equals(currentUserEmail) && !wantsAdmin) {
-            throw new IllegalArgumentException("Bạn không thể tự gỡ quyền ADMIN của chính mình!");
+            throw new IllegalArgumentException("You cannot demote your own ADMIN role");
         }
 
         Set<Role> roles = request.getRoles().stream()
@@ -68,12 +73,16 @@ public class UserService {
     @Transactional
     public void lockUser(Long id) {
         User user = userRepository.findByIdWithDeleted(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.isDeleted()) {
+            throw new ResourceNotFoundException("User not found");
+        }
 
         // Self-lockout prevention check
         String currentUserEmail = getCurrentUserEmail();
         if (user.getEmail().equals(currentUserEmail)) {
-            throw new IllegalArgumentException("Bạn không thể tự khóa tài khoản của chính mình!");
+            throw new IllegalArgumentException("You cannot lock your own account");
         }
 
         user.setLocked(true);
@@ -83,10 +92,32 @@ public class UserService {
     @Transactional
     public void restoreUser(Long id) {
         User user = userRepository.findByIdWithDeleted(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        if (user.isDeleted()) {
+            throw new ResourceNotFoundException("User not found");
+        }
         
         user.setLocked(false);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findByIdWithDeleted(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (user.isDeleted()) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        // Prevent self-deletion
+        String currentUserEmail = getCurrentUserEmail();
+        if (user.getEmail().equals(currentUserEmail)) {
+            throw new IllegalArgumentException("You cannot delete your own account");
+        }
+
+        userRepository.delete(user);
     }
 
     private UserResponse toResponse(User user) {
@@ -103,5 +134,27 @@ public class UserService {
                 .deleted(user.isDeleted())
                 .locked(user.isLocked())
                 .build();
+    }
+
+    @Transactional
+    public UserResponse updateProfile(String email, com._eleven.shop.dto.UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setFullName(request.getFullName());
+        User updatedUser = userRepository.save(user);
+        return toResponse(updatedUser);
+    }
+
+    @Transactional
+    public void changePassword(String email, com._eleven.shop.dto.ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect password, please try again");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

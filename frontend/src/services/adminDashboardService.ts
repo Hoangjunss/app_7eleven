@@ -50,4 +50,42 @@ export const adminDashboardService = {
     });
     return res.data.data;
   },
+
+  getRevenueStats: async (startDate: string, endDate: string): Promise<any> => {
+    const res = await apiClient.get(`/admin/dashboard/revenue-stats`, {
+      params: { startDate, endDate },
+    });
+    return res.data.data;
+  },
+
+  getOrderStats: async (startDate: string, endDate: string): Promise<any> => {
+    const res = await apiClient.get(`/admin/dashboard/order-stats`, {
+      params: { startDate, endDate },
+    });
+    return res.data.data;
+  },
+
+  getLowStockProducts: async (): Promise<any> => {
+    const res = await apiClient.get(`/admin/dashboard/low-stock`);
+    return res.data.data;
+  },
+
+  getNoOrderProducts: async (): Promise<any> => {
+    const res = await apiClient.get(`/admin/dashboard/no-orders`);
+    return res.data.data;
+  },
+
+  getUserStats: async (startDate: string, endDate: string): Promise<any> => {
+    const res = await apiClient.get(`/admin/dashboard/user-stats`, {
+      params: { startDate, endDate },
+    });
+    return res.data.data;
+  },
+
+  getCategoryRevenue: async (startDate: string, endDate: string): Promise<any> => {
+    const res = await apiClient.get(`/admin/dashboard/category-revenue`, {
+      params: { startDate, endDate },
+    });
+    return res.data.data;
+  },
 };

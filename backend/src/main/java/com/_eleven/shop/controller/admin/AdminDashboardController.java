@@ -50,4 +50,48 @@ public class AdminDashboardController {
         List<OrderResponse> data = dashboardService.getRecentOrders(limit);
         return ResponseEntity.ok(ApiResponse.success(data));
     }
+
+    @GetMapping("/revenue-stats")
+    public ResponseEntity<ApiResponse<RevenueDashboardResponse>> getRevenueStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
+        RevenueDashboardResponse data = dashboardService.getRevenueStats(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/order-stats")
+    public ResponseEntity<ApiResponse<OrderStatsResponse>> getOrderStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
+        OrderStatsResponse data = dashboardService.getOrderStats(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/low-stock")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getLowStockProducts() {
+        List<ProductResponse> data = dashboardService.getLowStockProducts();
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/no-orders")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getNoOrderProducts() {
+        List<ProductResponse> data = dashboardService.getNoOrderProducts30Days();
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/user-stats")
+    public ResponseEntity<ApiResponse<UserStatsResponse>> getUserStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
+        UserStatsResponse data = dashboardService.getUserStats(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
+
+    @GetMapping("/category-revenue")
+    public ResponseEntity<ApiResponse<List<CategoryRevenueResponse>>> getCategoryRevenue(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime endDate) {
+        List<CategoryRevenueResponse> data = dashboardService.getCategoryRevenues(startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(data));
+    }
 }

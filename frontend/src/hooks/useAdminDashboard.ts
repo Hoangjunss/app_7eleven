@@ -34,3 +34,51 @@ export function useDashboardRecentOrders(limit = 5) {
     staleTime: STALE_TIME,
   });
 }
+
+export function useDashboardRevenueStats(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: ["adminDashboard", "revenueStats", startDate, endDate],
+    queryFn: () => adminDashboardService.getRevenueStats(startDate, endDate),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useDashboardOrderStats(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: ["adminDashboard", "orderStats", startDate, endDate],
+    queryFn: () => adminDashboardService.getOrderStats(startDate, endDate),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useDashboardLowStock() {
+  return useQuery({
+    queryKey: ["adminDashboard", "lowStock"],
+    queryFn: () => adminDashboardService.getLowStockProducts(),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useDashboardNoOrders() {
+  return useQuery({
+    queryKey: ["adminDashboard", "noOrders"],
+    queryFn: () => adminDashboardService.getNoOrderProducts(),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useDashboardUserStats(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: ["adminDashboard", "userStats", startDate, endDate],
+    queryFn: () => adminDashboardService.getUserStats(startDate, endDate),
+    staleTime: STALE_TIME,
+  });
+}
+
+export function useDashboardCategoryRevenue(startDate: string, endDate: string) {
+  return useQuery({
+    queryKey: ["adminDashboard", "categoryRevenue", startDate, endDate],
+    queryFn: () => adminDashboardService.getCategoryRevenue(startDate, endDate),
+    staleTime: STALE_TIME,
+  });
+}

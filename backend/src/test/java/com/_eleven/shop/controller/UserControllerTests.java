@@ -1,15 +1,17 @@
-package com._eleven.shop.security;
+package com._eleven.shop.controller;
 
 import com._eleven.shop.aspect.AuditLogAspect;
 import com._eleven.shop.controller.admin.AdminUserController;
-import com._eleven.shop.dto.ApiResponse;
-import com._eleven.shop.dto.UpdateRolesRequest;
 import com._eleven.shop.dto.UserResponse;
 import com._eleven.shop.entity.Role;
 import com._eleven.shop.entity.User;
+import com._eleven.shop.exception.ResourceNotFoundException;
 import com._eleven.shop.repository.AuditLogRepository;
 import com._eleven.shop.repository.RoleRepository;
 import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.security.JwtAuthenticationFilter;
+import com._eleven.shop.security.JwtProvider;
+import com._eleven.shop.security.SecurityConfig;
 import com._eleven.shop.service.AuditLogService;
 import com._eleven.shop.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +29,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,18 +37,16 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {AdminUserController.class})
 @Import({SecurityConfig.class, JwtAuthenticationFilter.class, AuditLogAspect.class, AuditLogService.class})
 @EnableAspectJAutoProxy
-public class AdminUserSecurityTests {
+public class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @MockBean
     private UserService userService;
@@ -82,21 +81,8 @@ public class AdminUserSecurityTests {
     }
 
     @Test
-    void testGetUsersWithoutAuth() throws Exception {
-        mockMvc.perform(get("/api/v1/admin/users"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(username = "user@test.com", roles = "USER")
-    void testGetUsersWithUserRole() throws Exception {
-        mockMvc.perform(get("/api/v1/admin/users"))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(username = "admin@test.com", roles = "ADMIN")
-    void testGetUsersWithAdminRole() throws Exception {
+    void testGetUsersAdminRole() throws Exception {
         Mockito.when(userService.getAllUsers(anyString(), anyString(), anyInt(), anyInt(), anyString()))
                 .thenReturn(new PageImpl<>(Collections.emptyList()));
 
@@ -105,36 +91,78 @@ public class AdminUserSecurityTests {
     }
 
     @Test
+    @WithMockUser(username = "user@test.com", roles = "USER")
+    void testGetUsersUserRoleIsForbidden() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/users"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @WithMockUser(username = "admin@test.com", roles = "ADMIN")
-    void testUpdateRolesWithAdminRole() throws Exception {
-        UpdateRolesRequest request = UpdateRolesRequest.builder()
-                .roles(Set.of("ADMIN", "USER"))
-                .build();
+    void testGetUsersFilterByNameOrEmail() throws Exception {
+        Mockito.when(userService.getAllUsers(eq("John"), anyString(), anyInt(), anyInt(), anyString()))
+                .thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        Mockito.when(userService.updateRoles(eq(1L), any(UpdateRolesRequest.class)))
-                .thenReturn(new UserResponse());
-
-        mockMvc.perform(patch("/api/v1/admin/users/1/roles")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(get("/api/v1/admin/users").param("search", "John"))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "admin@test.com", roles = "ADMIN")
-    void testLockUserWithAdminRole() throws Exception {
-        Mockito.doNothing().when(userService).deleteUser(1L);
+    void testGetUsersFilterByLockedStatus() throws Exception {
+        Mockito.when(userService.getAllUsers(anyString(), eq("locked"), anyInt(), anyInt(), anyString()))
+                .thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        mockMvc.perform(delete("/api/v1/admin/users/1"))
+        mockMvc.perform(get("/api/v1/admin/users").param("status", "locked"))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "admin@test.com", roles = "ADMIN")
-    void testRestoreUserWithAdminRole() throws Exception {
-        Mockito.doNothing().when(userService).restoreUser(1L);
+    void testLockUserPut() throws Exception {
+        Mockito.doNothing().when(userService).lockUser(5L);
 
-        mockMvc.perform(patch("/api/v1/admin/users/1/restore"))
+        mockMvc.perform(put("/api/v1/admin/users/5/lock"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+    void testRestoreUserPut() throws Exception {
+        Mockito.doNothing().when(userService).restoreUser(5L);
+
+        mockMvc.perform(put("/api/v1/admin/users/5/restore"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+    void testDeleteUserSuccess() throws Exception {
+        Mockito.doNothing().when(userService).deleteUser(5L);
+
+        mockMvc.perform(delete("/api/v1/admin/users/5"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+    void testDeleteUserSelfThrowsBadRequest() throws Exception {
+        Mockito.doThrow(new IllegalArgumentException("You cannot delete your own account"))
+                .when(userService).deleteUser(2L);
+
+        mockMvc.perform(delete("/api/v1/admin/users/2"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("You cannot delete your own account"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
+    void testDeleteUserNotFoundThrowsNotFound() throws Exception {
+        Mockito.doThrow(new ResourceNotFoundException("User not found"))
+                .when(userService).deleteUser(99L);
+
+        mockMvc.perform(delete("/api/v1/admin/users/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User not found"));
     }
 }

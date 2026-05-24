@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ public class AdminProductController {
     private final ProductService productService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     @Auditable(action = "CREATE_PRODUCT", entityType = "PRODUCT")
     public ApiResponse<ProductResponse> createProductJson(@Valid @RequestBody ProductRequest request) {
         ProductResponse response = productService.createProduct(request, null, null);
@@ -35,6 +37,7 @@ public class AdminProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
     @Auditable(action = "CREATE_PRODUCT", entityType = "PRODUCT")
     public ApiResponse<ProductResponse> createProductMultipart(
             @RequestPart("product") @Valid ProductRequest request,
