@@ -31,10 +31,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      const errorMsg = error.response?.data?.message || "Phiên đăng nhập hết hạn hoặc tài khoản bị khóa.";
       // Clear token and user info from state and redirect to login
       useAuthStore.getState().logout();
       if (typeof window !== "undefined") {
-        window.location.href = "/login";
+        window.location.href = `/login?error=${encodeURIComponent(errorMsg)}`;
       }
     }
     return Promise.reject(error);

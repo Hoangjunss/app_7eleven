@@ -15,10 +15,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
 
-    @Query(value = "SELECT * FROM users u WHERE (:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%'))",
-           countQuery = "SELECT count(*) FROM users u WHERE (:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%'))",
+    @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
+    Optional<User> findByEmailWithDeleted(@Param("email") String email);
+
+    @Query(value = "SELECT * FROM users u WHERE " +
+                   "(:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%')) " +
+                   "AND (:status = 'all' OR (:status = 'active' AND u.deleted_at IS NULL) OR (:status = 'locked' AND u.deleted_at IS NOT NULL))",
+           countQuery = "SELECT count(*) FROM users u WHERE " +
+                        "(:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%')) " +
+                        "AND (:status = 'all' OR (:status = 'active' AND u.deleted_at IS NULL) OR (:status = 'locked' AND u.deleted_at IS NOT NULL))",
            nativeQuery = true)
-    Page<User> findAllUsersWithDeleted(@Param("search") String search, Pageable pageable);
+    Page<User> findAllUsersWithFilters(@Param("search") String search, @Param("status") String status, Pageable pageable);
 
     @Query(value = "SELECT * FROM users WHERE id = :id", nativeQuery = true)
     Optional<User> findByIdWithDeleted(@Param("id") Long id);

@@ -13,6 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -58,6 +65,8 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   // Debounce search query
   useEffect(() => {
@@ -73,6 +82,8 @@ export default function AdminUsersPage() {
     page,
     size: PAGE_SIZE,
     search: debouncedSearch,
+    status: statusFilter,
+    direction: sortDirection,
   });
 
   const users = userData?.data?.content ?? [];
@@ -154,8 +165,9 @@ export default function AdminUsersPage() {
       loading: "Đang khóa tài khoản...",
       success: () => {
         setIsLockOpen(false);
+        const name = selectedUser.fullName;
         setSelectedUser(null);
-        return "Khóa tài khoản người dùng thành công!";
+        return `Đã khóa tài khoản [${name}] thành công`;
       },
       error: "Không thể khóa tài khoản.",
     });
@@ -169,8 +181,9 @@ export default function AdminUsersPage() {
       loading: "Đang mở khóa tài khoản...",
       success: () => {
         setIsRestoreOpen(false);
+        const name = selectedUser.fullName;
         setSelectedUser(null);
-        return "Mở khóa tài khoản thành công!";
+        return `Đã mở khóa tài khoản [${name}] thành công`;
       },
       error: "Không thể mở khóa tài khoản.",
     });
@@ -201,7 +214,7 @@ export default function AdminUsersPage() {
 
       {/* Filter bar */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-grow max-w-md w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
           <Input
             value={searchQuery}
@@ -210,6 +223,31 @@ export default function AdminUsersPage() {
             className="pl-9 w-full bg-white/5 border-white/10 text-white placeholder-zinc-600 h-9 rounded-lg focus-visible:ring-primary"
           />
         </div>
+
+        <Select value={statusFilter} onValueChange={(val) => { setStatusFilter(val ?? "all"); setPage(0); }}>
+          <SelectTrigger className="w-full sm:w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
+            <SelectValue placeholder="Trạng thái tài khoản">
+              {statusFilter === "all" ? "Tất cả trạng thái" : statusFilter === "active" ? "Hoạt động" : "Bị khóa"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent className="bg-zinc-950 border-white/10 text-white">
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="active">Hoạt động</SelectItem>
+            <SelectItem value="locked">Bị khóa</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={sortDirection} onValueChange={(val) => { setSortDirection((val as "asc" | "desc") ?? "desc"); setPage(0); }}>
+          <SelectTrigger className="w-full sm:w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
+            <SelectValue placeholder="Sắp xếp ngày đăng ký">
+              {sortDirection === "desc" ? "Mới nhất trước" : "Cũ nhất trước"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent className="bg-zinc-950 border-white/10 text-white">
+            <SelectItem value="desc">Mới nhất trước</SelectItem>
+            <SelectItem value="asc">Cũ nhất trước</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Error State */}

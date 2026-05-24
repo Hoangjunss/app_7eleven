@@ -28,9 +28,10 @@ public class UserService {
     private final RoleRepository roleRepository;
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> getAllUsers(String search, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        Page<User> userPage = userRepository.findAllUsersWithDeleted(search, pageable);
+    public Page<UserResponse> getAllUsers(String search, String status, int page, int size, String direction) {
+        Sort.Direction sortDirection = "asc".equalsIgnoreCase(direction) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "created_at"));
+        Page<User> userPage = userRepository.findAllUsersWithFilters(search, status, pageable);
         return userPage.map(this::toResponse);
     }
 

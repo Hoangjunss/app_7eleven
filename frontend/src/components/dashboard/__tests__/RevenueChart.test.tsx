@@ -5,7 +5,6 @@ import { RevenueChartData } from "@/services/adminDashboardService";
 
 // Mock recharts because ResponsiveContainer needs custom sizing that doesn't exist in JSDOM
 jest.mock("recharts", () => {
-  const React = require("react");
   return {
     ResponsiveContainer: ({ children }: any) => <div data-testid="responsive-container">{children}</div>,
     AreaChart: ({ children, data }: any) => <div data-testid="area-chart" data-data={JSON.stringify(data)}>{children}</div>,
@@ -31,7 +30,7 @@ describe("RevenueChart Component", () => {
   });
 
   it("should render chart canvas and elements when loaded", () => {
-    const { container } = render(
+    render(
       <RevenueChart data={mockChartData} isLoading={false} formatVND={formatVND} />
     );
 

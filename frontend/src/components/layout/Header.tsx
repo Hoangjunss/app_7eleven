@@ -41,10 +41,10 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success("Logged out successfully");
+      toast.success("Đăng xuất thành công!");
       router.push("/login");
     } catch {
-      toast.error("Logout failed");
+      toast.error("Đăng xuất thất bại");
     }
   };
 

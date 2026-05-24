@@ -6,7 +6,7 @@
  * and performs role-based redirects.
  */
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,8 +20,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 
 const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().min(1, { message: "Vui lòng điền đầy đủ thông tin: Email" }).email({ message: "Vui lòng nhập đúng định dạng email" }),
+  password: z.string().min(1, { message: "Vui lòng điền đầy đủ thông tin: Mật khẩu" }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -29,7 +29,19 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isAuthenticated, role } = useAuthStore();
+
+  // Read error query parameter and display it once
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      toast.error(decodeURIComponent(errorParam));
+      // Remove query param to avoid repeating toast on refresh/render
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -58,7 +70,7 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const authResponse = await login(data.email, data.password);
-      toast.success("Login successful!");
+      toast.success("Đăng nhập thành công!");
       
       if (authResponse.roles.includes("ADMIN")) {
         router.push("/admin/dashboard");
@@ -69,7 +81,7 @@ export default function LoginPage() {
       console.error("Login error:", error);
       const apiError =
         error.response?.data?.message ||
-        "Invalid credentials. Please verify your email and password.";
+        "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.";
       toast.error(apiError);
     } finally {
       setIsLoading(false);
