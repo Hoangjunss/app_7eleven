@@ -97,7 +97,7 @@ public class AdminUserSecurityTests {
     @Test
     @WithMockUser(username = "admin@test.com", roles = "ADMIN")
     void testGetUsersWithAdminRole() throws Exception {
-        Mockito.when(userService.getAllUsers(anyString(), anyInt(), anyInt()))
+        Mockito.when(userService.getAllUsers(anyString(), anyString(), anyInt(), anyInt(), anyString()))
                 .thenReturn(new PageImpl<>(Collections.emptyList()));
 
         mockMvc.perform(get("/api/v1/admin/users"))

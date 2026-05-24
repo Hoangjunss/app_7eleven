@@ -1,5 +1,6 @@
 package com._eleven.shop.security;
 
+import com._eleven.shop.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -32,6 +34,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
             String username = jwtProvider.getUsernameFromToken(token);
+
+            // Verify if user exists and is active (not soft deleted/locked) in database
+            if (!userRepository.existsByEmail(username)) {
+                SecurityContextHolder.clearContext();
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"message\":\"Tài khoản của bạn vừa bị khóa. Vui lòng liên hệ quản trị viên.\",\"status\":401}");
+                return;
+            }
+
             List<String> roles = jwtProvider.getRolesFromToken(token);
 
             List<GrantedAuthority> authorities = roles.stream()

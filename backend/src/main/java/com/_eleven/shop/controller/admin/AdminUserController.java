@@ -23,9 +23,11 @@ public class AdminUserController {
     @GetMapping
     public ApiResponse<Page<UserResponse>> getAllUsers(
             @RequestParam(required = false, defaultValue = "") String search,
+            @RequestParam(required = false, defaultValue = "all") String status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Page<UserResponse> users = userService.getAllUsers(search, page, size);
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "desc") String direction) {
+        Page<UserResponse> users = userService.getAllUsers(search, status, page, size, direction);
         return ApiResponse.success(users, "Users retrieved successfully");
     }
 

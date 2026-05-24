@@ -5,7 +5,6 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
 import ProductGrid from "@/components/product/ProductGrid";
 import FilterSidebar from "@/components/product/FilterSidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -23,17 +22,17 @@ export default function ProductDirectoryClient() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Parse filters from URL params
+  // Parse filters from URL params (1-indexed for the user)
   const search = searchParams.get("search") || "";
   const categoryId = searchParams.get("categoryId") || "";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
-  const currentPage = parseInt(searchParams.get("page") || "0", 10);
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const size = 12;
 
-  // React Query fetch
+  // React Query fetch (uses 0-indexed for backend API)
   const { data, isLoading, isError, error, refetch } = useProducts({
-    page: currentPage,
+    page: Math.max(0, currentPage - 1),
     size,
     search,
     categoryId,
@@ -60,7 +59,7 @@ export default function ProductDirectoryClient() {
       }
     });
 
-    // Reset to page 0 if filters change (except when page itself is being changed)
+    // Reset to page 1 if filters change (except when page itself is being changed)
     if (newParams.page === undefined) {
       current.delete("page");
     }
@@ -136,42 +135,43 @@ export default function ProductDirectoryClient() {
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => {
-                        if (currentPage > 0) handlePageChange(currentPage - 1);
+                        if (currentPage > 1) handlePageChange(currentPage - 1);
                       }}
-                      className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
 
                   {Array.from({ length: totalPages }).map((_, idx) => {
+                    const pageNum = idx + 1;
                     if (
-                      idx === 0 ||
-                      idx === totalPages - 1 ||
-                      Math.abs(idx - currentPage) <= 1
+                      pageNum === 1 ||
+                      pageNum === totalPages ||
+                      Math.abs(pageNum - currentPage) <= 1
                     ) {
                       return (
                         <PaginationItem key={idx}>
                           <PaginationLink
-                            isActive={idx === currentPage}
-                            onClick={() => handlePageChange(idx)}
+                            isActive={pageNum === currentPage}
+                            onClick={() => handlePageChange(pageNum)}
                             className="cursor-pointer"
                           >
-                            {idx + 1}
+                            {pageNum}
                           </PaginationLink>
                         </PaginationItem>
                       );
                     } else if (
-                      idx === 1 ||
-                      idx === totalPages - 2
+                      pageNum === 2 ||
+                      pageNum === totalPages - 1
                     ) {
                       // Only render ellipsis once for gap
-                      if (idx === 1 && currentPage > 2) {
+                      if (pageNum === 2 && currentPage > 3) {
                         return (
                           <PaginationItem key={idx}>
                             <span className="text-zinc-500 px-2 select-none">...</span>
                           </PaginationItem>
                         );
                       }
-                      if (idx === totalPages - 2 && currentPage < totalPages - 3) {
+                      if (pageNum === totalPages - 1 && currentPage < totalPages - 2) {
                         return (
                           <PaginationItem key={idx}>
                             <span className="text-zinc-500 px-2 select-none">...</span>
@@ -185,9 +185,9 @@ export default function ProductDirectoryClient() {
                   <PaginationItem>
                     <PaginationNext
                       onClick={() => {
-                        if (currentPage < totalPages - 1) handlePageChange(currentPage + 1);
+                        if (currentPage < totalPages) handlePageChange(currentPage + 1);
                       }}
-                      className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
                 </PaginationContent>

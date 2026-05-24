@@ -43,7 +43,7 @@ export default function AdminSidebar({ className }: { className?: string }) {
   ];
 
   return (
-    <aside className={cn("w-64 shrink-0 border-r border-white/10 bg-[#09090b]/40 backdrop-blur-md min-h-[calc(100vh-69px)] flex flex-col p-4 space-y-2", className)}>
+    <aside className={cn("w-64 shrink-0 border-r border-white/10 bg-[#09090b]/40 backdrop-blur-md sticky top-[69px] h-[calc(100vh-69px)] flex flex-col p-4 space-y-2 overflow-y-auto", className)}>
       <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
         Management Menu
       </div>

@@ -175,7 +175,7 @@ export default function ProductDetailClient({ id }: ProductDetailClientProps) {
                       : "border-white/10 hover:border-white/30"
                   }`}
                 >
-                  // eslint-disable-next-line @next/next/no-img-element
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={img.imageUrl}
                     alt={`${product.name} thumbnail`}

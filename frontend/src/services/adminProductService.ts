@@ -6,6 +6,8 @@ export interface AdminGetProductsParams {
   size?: number;
   name?: string;
   categoryId?: string | number;
+  minPrice?: string | number;
+  maxPrice?: string | number;
   sortBy?: string;
   direction?: string;
 }
@@ -26,6 +28,8 @@ export const adminProductService = {
         size: params.size ?? 10,
         name: params.name || "",
         categoryId: params.categoryId || "",
+        minPrice: params.minPrice || "",
+        maxPrice: params.maxPrice || "",
         sortBy: params.sortBy || "createdAt",
         direction: params.direction || "desc",
       },

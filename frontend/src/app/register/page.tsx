@@ -21,13 +21,22 @@ import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 
 const registerSchema = z
   .object({
-    fullName: z.string().min(1, "Full name is required"),
-    email: z.string().min(1, "Email is required").email("Invalid email format"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
+    fullName: z.string().min(1, "Vui lòng điền đầy đủ thông tin: Họ và tên"),
+    email: z
+      .string()
+      .min(1, "Vui lòng điền đầy đủ thông tin: Email")
+      .email("Vui lòng nhập đúng định dạng email"),
+    password: z
+      .string()
+      .min(1, "Vui lòng điền đầy đủ thông tin: Mật khẩu")
+      .min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
+    confirmPassword: z
+      .string()
+      .min(1, "Vui lòng điền đầy đủ thông tin: Xác nhận mật khẩu")
+      .min(6, "Mật khẩu xác nhận phải có ít nhất 6 ký tự"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Mật khẩu xác nhận không khớp",
     path: ["confirmPassword"],
   });
 
@@ -42,7 +51,7 @@ export default function RegisterPage() {
   useEffect(() => {
     if (isAuthenticated) {
       if (role === "ADMIN") {
-        router.push("/admin/products");
+        router.push("/admin/dashboard");
       } else {
         router.push("/");
       }
@@ -68,14 +77,14 @@ export default function RegisterPage() {
     try {
       const { email, password, fullName } = data;
       await registerUser({ email, password, fullName });
-      toast.success("Account registered successfully! Redirecting to login...");
+      toast.success("Đăng ký tài khoản thành công! Đang chuyển hướng...");
       setTimeout(() => {
         router.push("/login");
       }, 1500);
     } catch (error: any) {
       console.error("Register error:", error);
       const apiError =
-        error.response?.data?.message || "Registration failed. Please try again.";
+        error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
       toast.error(apiError);
     } finally {
       setIsLoading(false);

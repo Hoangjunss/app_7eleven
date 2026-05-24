@@ -80,7 +80,14 @@ export default function AdminProductsPage() {
   const [searchName, setSearchName] = useState("");
   const [debouncedName, setDebouncedName] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [minPriceInput, setMinPriceInput] = useState("");
+  const [maxPriceInput, setMaxPriceInput] = useState("");
+  const [debouncedMinPrice, setDebouncedMinPrice] = useState("");
+  const [debouncedMaxPrice, setDebouncedMaxPrice] = useState("");
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const minPriceDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxPriceDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounce search input
   const handleSearchChange = (value: string) => {
@@ -99,6 +106,24 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleMinPriceChange = (value: string) => {
+    setMinPriceInput(value);
+    if (minPriceDebounceRef.current) clearTimeout(minPriceDebounceRef.current);
+    minPriceDebounceRef.current = setTimeout(() => {
+      setDebouncedMinPrice(value);
+      setPage(0);
+    }, 400);
+  };
+
+  const handleMaxPriceChange = (value: string) => {
+    setMaxPriceInput(value);
+    if (maxPriceDebounceRef.current) clearTimeout(maxPriceDebounceRef.current);
+    maxPriceDebounceRef.current = setTimeout(() => {
+      setDebouncedMaxPrice(value);
+      setPage(0);
+    }, 400);
+  };
+
   // Queries
   const { data: catData } = useCategories();
   const categories = catData?.data ?? [];
@@ -108,6 +133,8 @@ export default function AdminProductsPage() {
     size: PAGE_SIZE,
     name: debouncedName || undefined,
     categoryId: categoryFilter !== "all" ? categoryFilter : undefined,
+    minPrice: debouncedMinPrice || undefined,
+    maxPrice: debouncedMaxPrice || undefined,
   });
 
   const products = prodData?.data?.content ?? [];
@@ -198,12 +225,14 @@ export default function AdminProductsPage() {
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formName.trim()) return toast.error("Tên sản phẩm không được trống");
-    if (!formPrice || isNaN(Number(formPrice)) || Number(formPrice) < 0)
+    if (!formName.trim()) return toast.error("Vui lòng điền đầy đủ thông tin: Tên sản phẩm");
+    if (!formPrice.toString().trim()) return toast.error("Vui lòng điền đầy đủ thông tin: Giá sản phẩm");
+    if (isNaN(Number(formPrice)) || Number(formPrice) < 0)
       return toast.error("Giá sản phẩm phải là số dương");
-    if (!formStock || isNaN(Number(formStock)) || Number(formStock) < 0)
+    if (!formStock.toString().trim()) return toast.error("Vui lòng điền đầy đủ thông tin: Số lượng kho");
+    if (isNaN(Number(formStock)) || Number(formStock) < 0)
       return toast.error("Số lượng kho phải là số lớn hơn hoặc bằng 0");
-    if (!formCategory) return toast.error("Vui lòng chọn danh mục");
+    if (!formCategory) return toast.error("Vui lòng điền đầy đủ thông tin: Danh mục");
 
     const productPayload = {
       name: formName,
@@ -295,8 +324,8 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col md:flex-row gap-3 mb-5 items-center">
+        <div className="relative flex-grow max-w-md w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
           <Input
             value={searchName}
@@ -307,8 +336,12 @@ export default function AdminProductsPage() {
         </div>
 
         <Select value={categoryFilter} onValueChange={handleCategoryChange}>
-          <SelectTrigger className="w-full sm:w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
-            <SelectValue placeholder="Lọc theo danh mục" />
+          <SelectTrigger className="w-full md:w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
+            <SelectValue placeholder="Lọc theo danh mục">
+              {categoryFilter === "all"
+                ? "Tất cả danh mục"
+                : (categories.find((cat) => cat.id.toString() === categoryFilter)?.name || "")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-zinc-950 border-white/10 text-white">
             <SelectItem value="all">Tất cả danh mục</SelectItem>
@@ -323,6 +356,26 @@ export default function AdminProductsPage() {
             ))}
           </SelectContent>
         </Select>
+
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <Input
+            type="number"
+            min="0"
+            value={minPriceInput}
+            onChange={(e) => handleMinPriceChange(e.target.value)}
+            placeholder="Giá từ..."
+            className="bg-white/5 border-white/10 text-white h-9 rounded-lg w-full md:w-28 font-mono text-xs"
+          />
+          <span className="text-zinc-500 text-xs shrink-0">—</span>
+          <Input
+            type="number"
+            min="0"
+            value={maxPriceInput}
+            onChange={(e) => handleMaxPriceChange(e.target.value)}
+            placeholder="Đến..."
+            className="bg-white/5 border-white/10 text-white h-9 rounded-lg w-full md:w-28 font-mono text-xs"
+          />
+        </div>
       </div>
 
       {/* Error State */}
@@ -480,14 +533,18 @@ export default function AdminProductsPage() {
         </>
       )}
 
-      {/* Form Dialog Modal (Create / Edit) */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="bg-zinc-950 border-white/10 text-white max-w-2xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="bg-zinc-950 border-white/10 text-white max-w-3xl md:max-w-4xl p-6 md:p-8 overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Package className="h-5 w-5 text-primary" />
               {currentProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
             </DialogTitle>
+            {!currentProduct && (
+              <p className="text-xs text-primary/95 mt-2 font-medium bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg">
+                💡 Bạn có thể thêm nhiều sản phẩm liên tiếp mà không cần tải lại trang.
+              </p>
+            )}
           </DialogHeader>
 
           <form onSubmit={handleSaveProduct} className="space-y-4 py-2">
@@ -498,7 +555,6 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Tên sản phẩm *</label>
                   <Input
                     required
-                    maxLength={255}
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="Nhập tên sản phẩm..."
@@ -537,7 +593,11 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Danh mục *</label>
                   <Select value={formCategory} onValueChange={(val) => val && setFormCategory(val)}>
                     <SelectTrigger className="bg-white/5 border-white/10 text-white h-9 rounded-lg">
-                      <SelectValue placeholder="Chọn danh mục" />
+                      <SelectValue placeholder="Chọn danh mục">
+                        {formCategory
+                          ? (categories.find((cat) => cat.id.toString() === formCategory)?.name || "")
+                          : "Chọn danh mục"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-950 border-white/10 text-white">
                       {categories.map((cat) => (
@@ -553,7 +613,6 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Mô tả sản phẩm</label>
                   <textarea
                     rows={4}
-                    maxLength={2000}
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Mô tả sản phẩm chi tiết..."
