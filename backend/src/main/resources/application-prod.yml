@@ -26,3 +26,7 @@ logging:
   level:
     root: WARN
     com._eleven.shop: INFO
+
+cors:
+  allowed:
+    origins: ${CORS_ALLOWED_ORIGINS:https://test7eleven.online,https://admin.test7eleven.online,http://localhost:3000,http://103.72.99.211:3000}
