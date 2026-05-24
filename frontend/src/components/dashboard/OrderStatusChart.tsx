@@ -28,7 +28,7 @@ export default function OrderStatusChart({ kpi, isLoading }: OrderStatusChartPro
   if (!isMounted || isLoading) {
     return (
       <div className="h-80 flex items-center justify-center bg-white/5 border border-white/10 rounded-lg animate-pulse">
-        <span className="text-zinc-500 text-sm">Đang tải dữ liệu biểu đồ...</span>
+        <span className="text-zinc-500 text-sm">Đang tải dữ liệu...</span>
       </div>
     );
   }

@@ -57,6 +57,7 @@ import {
   Image as ImageIcon,
   Check,
   X,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -673,10 +674,17 @@ export default function AdminProductsPage() {
               </Button>
               <Button
                 type="submit"
-                disabled={createProductMutation.isPending || updateProductMutation.isPending}
-                className="bg-primary hover:bg-secondary text-white rounded-lg h-9 px-5 cursor-pointer font-medium"
+                disabled={createProductMutation.isPending || updateProductMutation.isPending || uploadImagesMutation.isPending}
+                className="bg-primary hover:bg-secondary text-white rounded-lg h-9 px-5 cursor-pointer font-medium flex items-center justify-center gap-1.5"
               >
-                Lưu lại
+                {createProductMutation.isPending || updateProductMutation.isPending || uploadImagesMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  "Lưu lại"
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -707,10 +715,18 @@ export default function AdminProductsPage() {
             </Button>
             <Button
               type="button"
+              disabled={deleteProductMutation.isPending}
               onClick={handleDeleteConfirm}
-              className="bg-red-600 hover:bg-red-500 text-white rounded-lg h-9 px-5 cursor-pointer font-medium"
+              className="bg-red-600 hover:bg-red-500 text-white rounded-lg h-9 px-5 cursor-pointer font-medium flex items-center justify-center gap-1.5"
             >
-              Đồng ý xóa
+              {deleteProductMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Đang xóa...
+                </>
+              ) : (
+                "Đồng ý xóa"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
