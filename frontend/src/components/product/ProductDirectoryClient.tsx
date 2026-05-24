@@ -135,9 +135,7 @@ export default function ProductDirectoryClient() {
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => {
                         if (currentPage > 0) handlePageChange(currentPage - 1);
                       }}
                       className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
@@ -153,12 +151,8 @@ export default function ProductDirectoryClient() {
                       return (
                         <PaginationItem key={idx}>
                           <PaginationLink
-                            href="#"
                             isActive={idx === currentPage}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handlePageChange(idx);
-                            }}
+                            onClick={() => handlePageChange(idx)}
                             className="cursor-pointer"
                           >
                             {idx + 1}
@@ -190,9 +184,7 @@ export default function ProductDirectoryClient() {
 
                   <PaginationItem>
                     <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
+                      onClick={() => {
                         if (currentPage < totalPages - 1) handlePageChange(currentPage + 1);
                       }}
                       className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
