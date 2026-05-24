@@ -3,10 +3,10 @@ package com._eleven.shop.aspect;
 import com._eleven.shop.entity.AuditLog;
 import com._eleven.shop.entity.User;
 import com._eleven.shop.entity.Role;
-import com._eleven.shop.repository.UserRepository;
-import com._eleven.shop.service.AuditLogService;
-import com._eleven.shop.dto.LoginRequest;
-import com._eleven.shop.dto.RegisterRequest;
+import com._eleven.shop.repository.user.UserRepository;
+import com._eleven.shop.service.audit.AuditLogService;
+import com._eleven.shop.dto.auth.LoginRequest;
+import com._eleven.shop.dto.auth.RegisterRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,9 @@ public class AuditLogAspect {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
+    private record ActorInfo(String actorId, String actorEmail, String actorRole) {}
+    private record RequestDetails(String ipAddress, String userAgent) {}
+
     @Around("@annotation(auditable)")
     public Object audit(ProceedingJoinPoint joinPoint, Auditable auditable) throws Throwable {
         Object resultVal = null;
@@ -60,6 +63,34 @@ public class AuditLogAspect {
     }
 
     private void saveAuditLog(ProceedingJoinPoint joinPoint, Auditable auditable, String resultStatus, String errorMessage) {
+        RequestDetails requestDetails = getRequestDetails();
+
+        Object[] args = joinPoint.getArgs();
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        String[] parameterNames = signature.getParameterNames();
+
+        Map<String, Object> details = getSanitizedDetails(parameterNames, args);
+        ActorInfo actorInfo = getActorInfo(args);
+        String action = determineAction(auditable, resultStatus);
+
+        AuditLog auditLog = AuditLog.builder()
+                .actorId(actorInfo.actorId())
+                .actorEmail(actorInfo.actorEmail())
+                .actorRole(actorInfo.actorRole())
+                .action(action)
+                .entityType(auditable.entityType().isEmpty() ? null : auditable.entityType())
+                .entityId(null)
+                .details(details)
+                .ipAddress(requestDetails.ipAddress())
+                .userAgent(requestDetails.userAgent())
+                .result(resultStatus)
+                .errorMessage(errorMessage)
+                .build();
+
+        auditLogService.save(auditLog);
+    }
+
+    private RequestDetails getRequestDetails() {
         HttpServletRequest request = null;
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
@@ -78,13 +109,10 @@ public class AuditLogAspect {
                 userAgent = "unknown";
             }
         }
+        return new RequestDetails(ipAddress, userAgent);
+    }
 
-        Object[] args = joinPoint.getArgs();
-        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-        String[] parameterNames = signature.getParameterNames();
-
-        Map<String, Object> details = getSanitizedDetails(parameterNames, args);
-
+    private ActorInfo getActorInfo(Object[] args) {
         String actorEmail = null;
         String actorId = null;
         String actorRole = null;
@@ -128,8 +156,10 @@ public class AuditLogAspect {
                 log.warn("Could not retrieve user info from db for email: {}", actorEmail, e);
             }
         }
+        return new ActorInfo(actorId, actorEmail, actorRole);
+    }
 
-        // Resolve action based on @Auditable and status
+    private String determineAction(Auditable auditable, String resultStatus) {
         String action = auditable.action();
         if ("LOGIN".equalsIgnoreCase(action)) {
             if ("SUCCESS".equals(resultStatus)) {
@@ -138,22 +168,7 @@ public class AuditLogAspect {
                 action = "LOGIN_FAILED";
             }
         }
-
-        AuditLog auditLog = AuditLog.builder()
-                .actorId(actorId)
-                .actorEmail(actorEmail)
-                .actorRole(actorRole)
-                .action(action)
-                .entityType(auditable.entityType().isEmpty() ? null : auditable.entityType())
-                .entityId(null)
-                .details(details)
-                .ipAddress(ipAddress)
-                .userAgent(userAgent)
-                .result(resultStatus)
-                .errorMessage(errorMessage)
-                .build();
-
-        auditLogService.save(auditLog);
+        return action;
     }
 
     private Map<String, Object> getSanitizedDetails(String[] parameterNames, Object[] args) {

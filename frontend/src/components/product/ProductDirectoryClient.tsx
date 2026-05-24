@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -17,26 +17,32 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-
 export default function ProductDirectoryClient() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Parse filters from URL params (1-indexed for the user)
+  // Lấy filter từ URL
   const search = searchParams.get("search") || "";
   const categoryId = searchParams.get("categoryId") || "";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
-  
+
+  // State cho page (1-indexed), khởi tạo từ URL nếu có để hỗ trợ copy link/refresh
   const pageParam = searchParams.get("page");
   const parsedPage = pageParam ? parseInt(pageParam, 10) : 1;
-  const currentPage = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+  const initialPage = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+  const [page, setPage] = useState(initialPage);
   const size = 12;
 
-  // React Query fetch (uses 0-indexed for backend API)
+  // Reset page về 1 khi filter thay đổi
+  useEffect(() => {
+    setPage(1);
+  }, [search, categoryId, minPrice, maxPrice]);
+
+  // Gọi API (backend 0-indexed)
   const { data, isLoading, isError, error, refetch } = useProducts({
-    page: currentPage - 1, // Guaranteed to be >= 0
+    page: page - 1, // Guaranteed to be >= 0
     size,
     search,
     categoryId,
@@ -52,46 +58,45 @@ export default function ProductDirectoryClient() {
     }
   }, [isError, error]);
 
-  const updateParams = (newParams: Record<string, string | number | undefined>) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    
+  // Đồng bộ URL với page (không gây reload, tránh race condition)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (page === 1) {
+      params.delete("page");
+    } else {
+      params.set("page", String(page));
+    }
+    const newUrl = `${pathname}?${params.toString()}`;
+    router.replace(newUrl, { scroll: false });
+  }, [page, pathname, searchParams, router]);
+
+  // Handler chuyển trang
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Các hàm xử lý filter (giữ nguyên logic cập nhật URL)
+  const updateParams = (newParams: Record<string, string | undefined>) => {
+    const current = new URLSearchParams(searchParams.toString());
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === undefined || value === "") {
         current.delete(key);
       } else {
-        current.set(key, String(value));
+        current.set(key, value);
       }
     });
-
-    // Reset to page 1 if filters change (except when page itself is being changed)
-    if (newParams.page === undefined) {
-      current.delete("page");
-    }
-
+    // Không xóa page ở đây, page sẽ được reset qua useEffect khi filter thay đổi
     const searchStr = current.toString();
     const query = searchStr ? `?${searchStr}` : "";
     router.push(`${pathname}${query}`);
   };
 
-  const handleSearchChange = (val: string) => {
-    updateParams({ search: val });
-  };
-
-  const handleCategoryChange = (val: string) => {
-    updateParams({ categoryId: val });
-  };
-
-  const handlePriceChange = (min: string, max: string) => {
-    updateParams({ minPrice: min, maxPrice: max });
-  };
-
-  const handlePageChange = (newPage: number) => {
-    updateParams({ page: newPage });
-  };
-
-  const handleReset = () => {
-    router.push(pathname);
-  };
+  // Các handler cụ thể (giữ nguyên)
+  const handleSearchChange = (val: string) => updateParams({ search: val });
+  const handleCategoryChange = (val: string) => updateParams({ categoryId: val });
+  const handlePriceChange = (min: string, max: string) => updateParams({ minPrice: min, maxPrice: max });
+  const handleReset = () => router.push(pathname);
 
   const productsData = data?.data;
   const products = productsData?.content || [];
@@ -140,9 +145,9 @@ export default function ProductDirectoryClient() {
                   <PaginationItem>
                     <PaginationLink
                       onClick={() => {
-                        if (currentPage > 1) handlePageChange(1);
+                        if (page > 1) handlePageChange(1);
                       }}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       title="Trang đầu"
                     >
                       <ChevronsLeft className="h-4 w-4" />
@@ -152,9 +157,9 @@ export default function ProductDirectoryClient() {
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => {
-                        if (currentPage > 1) handlePageChange(currentPage - 1);
+                        if (page > 1) handlePageChange(page - 1);
                       }}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
 
@@ -163,12 +168,12 @@ export default function ProductDirectoryClient() {
                     if (
                       pageNum === 1 ||
                       pageNum === totalPages ||
-                      Math.abs(pageNum - currentPage) <= 1
+                      Math.abs(pageNum - page) <= 1
                     ) {
                       return (
                         <PaginationItem key={idx}>
                           <PaginationLink
-                            isActive={pageNum === currentPage}
+                            isActive={pageNum === page}
                             onClick={() => handlePageChange(pageNum)}
                             className="cursor-pointer"
                           >
@@ -181,14 +186,14 @@ export default function ProductDirectoryClient() {
                       pageNum === totalPages - 1
                     ) {
                       // Only render ellipsis once for gap
-                      if (pageNum === 2 && currentPage > 3) {
+                      if (pageNum === 2 && page > 3) {
                         return (
                           <PaginationItem key={idx}>
                             <span className="text-zinc-500 px-2 select-none">...</span>
                           </PaginationItem>
                         );
                       }
-                      if (pageNum === totalPages - 1 && currentPage < totalPages - 2) {
+                      if (pageNum === totalPages - 1 && page < totalPages - 2) {
                         return (
                           <PaginationItem key={idx}>
                             <span className="text-zinc-500 px-2 select-none">...</span>
@@ -202,9 +207,9 @@ export default function ProductDirectoryClient() {
                   <PaginationItem>
                     <PaginationNext
                       onClick={() => {
-                        if (currentPage < totalPages) handlePageChange(currentPage + 1);
+                        if (page < totalPages) handlePageChange(page + 1);
                       }}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
                   </PaginationItem>
 
@@ -212,9 +217,9 @@ export default function ProductDirectoryClient() {
                   <PaginationItem>
                     <PaginationLink
                       onClick={() => {
-                        if (currentPage < totalPages) handlePageChange(totalPages);
+                        if (page < totalPages) handlePageChange(totalPages);
                       }}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                       title="Trang cuối"
                     >
                       <ChevronsRight className="h-4 w-4" />

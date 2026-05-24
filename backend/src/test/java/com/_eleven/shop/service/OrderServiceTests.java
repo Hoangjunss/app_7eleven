@@ -1,12 +1,21 @@
 package com._eleven.shop.service;
+import com._eleven.shop.service.cart.CartService;
+import com._eleven.shop.service.order.OrderServiceImpl;
 
-import com._eleven.shop.dto.*;
+import com._eleven.shop.dto.common.*;
+import com._eleven.shop.dto.auth.*;
+import com._eleven.shop.dto.product.*;
+import com._eleven.shop.dto.order.*;
+import com._eleven.shop.dto.user.*;
+import com._eleven.shop.dto.category.*;
+import com._eleven.shop.dto.cart.*;
+import com._eleven.shop.dto.dashboard.*;
 import com._eleven.shop.entity.*;
 import com._eleven.shop.exception.InsufficientStockException;
 import com._eleven.shop.exception.ResourceNotFoundException;
-import com._eleven.shop.repository.OrderRepository;
-import com._eleven.shop.repository.ProductRepository;
-import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.repository.order.OrderRepository;
+import com._eleven.shop.repository.product.ProductRepository;
+import com._eleven.shop.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

@@ -1,12 +1,18 @@
 package com._eleven.shop.service;
+import com._eleven.shop.service.cart.CartService;
+import com._eleven.shop.service.order.OrderService;
 
-import com._eleven.shop.dto.CartItemResponse;
-import com._eleven.shop.dto.CartResponse;
-import com._eleven.shop.dto.OrderRequest;
-import com._eleven.shop.dto.OrderResponse;
+import com._eleven.shop.dto.cart.CartItemResponse;
+import com._eleven.shop.dto.cart.CartResponse;
+import com._eleven.shop.dto.order.OrderRequest;
+import com._eleven.shop.dto.order.OrderResponse;
 import com._eleven.shop.entity.*;
 import com._eleven.shop.exception.InsufficientStockException;
-import com._eleven.shop.repository.*;
+import com._eleven.shop.repository.product.*;
+import com._eleven.shop.repository.order.*;
+import com._eleven.shop.repository.user.*;
+import com._eleven.shop.repository.category.*;
+import com._eleven.shop.repository.audit.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
