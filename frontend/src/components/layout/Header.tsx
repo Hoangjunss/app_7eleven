@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart } from "lucide-react";
+import { User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart, Package } from "lucide-react";
 import { toast } from "sonner";
 import CartDrawer from "@/components/cart/CartDrawer";
 
@@ -147,13 +147,8 @@ export default function Header() {
                     <DropdownMenuSeparator className="bg-white/10" />
                     {!isAdminPage && (
                       <DropdownMenuItem
-                        render={
-                          <button
-                            onClick={() => setCartDrawerOpen(true)}
-                            className="flex w-full items-center gap-2"
-                          />
-                        }
-                        className="hover:bg-white/5 cursor-pointer"
+                        onClick={() => setCartDrawerOpen(true)}
+                        className="hover:bg-white/5 cursor-pointer flex w-full items-center gap-2"
                       >
                         <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                         Giỏ hàng
@@ -162,6 +157,15 @@ export default function Header() {
                         )}
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem
+                      render={
+                        <Link href="/orders" className="flex w-full items-center gap-2" />
+                      }
+                      className="hover:bg-white/5 cursor-pointer"
+                    >
+                      <Package className="h-4 w-4 text-muted-foreground" />
+                      Lịch sử đơn hàng
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       render={
                         <Link href="/profile" className="flex w-full items-center gap-2" />
