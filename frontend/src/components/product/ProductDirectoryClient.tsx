@@ -7,6 +7,7 @@ import ProductGrid from "@/components/product/ProductGrid";
 import FilterSidebar from "@/components/product/FilterSidebar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -27,12 +28,15 @@ export default function ProductDirectoryClient() {
   const categoryId = searchParams.get("categoryId") || "";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  
+  const pageParam = searchParams.get("page");
+  const parsedPage = pageParam ? parseInt(pageParam, 10) : 1;
+  const currentPage = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
   const size = 12;
 
   // React Query fetch (uses 0-indexed for backend API)
   const { data, isLoading, isError, error, refetch } = useProducts({
-    page: Math.max(0, currentPage - 1),
+    page: currentPage - 1, // Guaranteed to be >= 0
     size,
     search,
     categoryId,
@@ -132,6 +136,19 @@ export default function ProductDirectoryClient() {
             {totalPages > 1 && (
               <Pagination className="mt-4">
                 <PaginationContent>
+                  {/* Trang đầu */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => {
+                        if (currentPage > 1) handlePageChange(1);
+                      }}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      title="Trang đầu"
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => {
@@ -189,6 +206,19 @@ export default function ProductDirectoryClient() {
                       }}
                       className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
                     />
+                  </PaginationItem>
+
+                  {/* Trang cuối */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => {
+                        if (currentPage < totalPages) handlePageChange(totalPages);
+                      }}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      title="Trang cuối"
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </PaginationLink>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

@@ -76,7 +76,7 @@ public class UserService {
             throw new IllegalArgumentException("Bạn không thể tự khóa tài khoản của chính mình!");
         }
 
-        user.setDeletedAt(OffsetDateTime.now());
+        user.setLocked(true);
         userRepository.save(user);
     }
 
@@ -85,7 +85,7 @@ public class UserService {
         User user = userRepository.findByIdWithDeleted(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         
-        user.setDeletedAt(null);
+        user.setLocked(false);
         userRepository.save(user);
     }
 
@@ -100,7 +100,8 @@ public class UserService {
                 .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .deletedAt(user.getDeletedAt())
+                .deleted(user.isDeleted())
+                .locked(user.isLocked())
                 .build();
     }
 }

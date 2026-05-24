@@ -9,6 +9,8 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  deleted: boolean;
+  locked: boolean;
 }
 
 export interface AdminGetUsersParams {

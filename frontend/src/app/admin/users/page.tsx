@@ -52,6 +52,8 @@ import {
   Check,
   UserCheck,
   UserX,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -300,7 +302,7 @@ export default function AdminUsersPage() {
               </TableHeader>
               <TableBody>
                 {users.map((user) => {
-                  const isLocked = !!user.deletedAt;
+                  const isLocked = user.locked;
                   const isSelf = user.email === currentUserEmail;
 
                   return (
@@ -414,6 +416,19 @@ export default function AdminUsersPage() {
             <div className="mt-6 flex justify-center">
               <Pagination>
                 <PaginationContent>
+                  {/* Trang đầu */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => setPage(0)}
+                      className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${
+                        page === 0 ? "pointer-events-none opacity-40" : ""
+                      }`}
+                      title="Trang đầu"
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -444,6 +459,19 @@ export default function AdminUsersPage() {
                         page >= totalPages - 1 ? "pointer-events-none opacity-40" : ""
                       }`}
                     />
+                  </PaginationItem>
+
+                  {/* Trang cuối */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => setPage(totalPages - 1)}
+                      className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${
+                        page >= totalPages - 1 ? "pointer-events-none opacity-40" : ""
+                      }`}
+                      title="Trang cuối"
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </PaginationLink>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

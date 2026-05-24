@@ -19,11 +19,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailWithDeleted(@Param("email") String email);
 
     @Query(value = "SELECT * FROM users u WHERE " +
-                   "(:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%')) " +
-                   "AND (:status = 'all' OR (:status = 'active' AND u.deleted_at IS NULL) OR (:status = 'locked' AND u.deleted_at IS NOT NULL))",
+                   "u.deleted = false " +
+                   "AND (:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%')) " +
+                   "AND (:status = 'all' OR (:status = 'active' AND u.locked = false) OR (:status = 'locked' AND u.locked = true))",
            countQuery = "SELECT count(*) FROM users u WHERE " +
-                        "(:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%')) " +
-                        "AND (:status = 'all' OR (:status = 'active' AND u.deleted_at IS NULL) OR (:status = 'locked' AND u.deleted_at IS NOT NULL))",
+                        "u.deleted = false " +
+                        "AND (:search IS NULL OR :search = '' OR u.email ILIKE CONCAT('%', :search, '%') OR u.full_name ILIKE CONCAT('%', :search, '%')) " +
+                        "AND (:status = 'all' OR (:status = 'active' AND u.locked = false) OR (:status = 'locked' AND u.locked = true))",
            nativeQuery = true)
     Page<User> findAllUsersWithFilters(@Param("search") String search, @Param("status") String status, Pageable pageable);
 

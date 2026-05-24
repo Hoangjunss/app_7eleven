@@ -33,7 +33,7 @@ public class AuthService {
 
     @Transactional
     public String register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.findByEmailWithDeleted(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email is already taken");
         }
 
@@ -57,8 +57,13 @@ public class AuthService {
         User user = userRepository.findByEmailWithDeleted(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Email không tồn tại trong hệ thống"));
 
-        // 2. Check if user account is locked
-        if (user.getDeletedAt() != null) {
+        // 2. Check if user is soft deleted (hidden completely)
+        if (user.isDeleted()) {
+            throw new IllegalArgumentException("Email không tồn tại trong hệ thống");
+        }
+
+        // 3. Check if user account is locked
+        if (user.isLocked()) {
             throw new IllegalArgumentException("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên để được hỗ trợ.");
         }
 

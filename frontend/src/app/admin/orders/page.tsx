@@ -34,7 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { ClipboardList, Eye, AlertTriangle, Search } from "lucide-react";
+import { ClipboardList, Eye, AlertTriangle, Search, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { toast } from "sonner";
 
 const STATUS_OPTIONS = [
@@ -257,6 +257,17 @@ export default function AdminOrdersPage() {
             <div className="mt-6 flex justify-center">
               <Pagination>
                 <PaginationContent>
+                  {/* Trang đầu */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => setPage(0)}
+                      className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${page === 0 ? "pointer-events-none opacity-40" : ""}`}
+                      title="Trang đầu"
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -282,6 +293,17 @@ export default function AdminOrdersPage() {
                       onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                       className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${page >= totalPages - 1 ? "pointer-events-none opacity-40" : ""}`}
                     />
+                  </PaginationItem>
+
+                  {/* Trang cuối */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => setPage(totalPages - 1)}
+                      className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${page >= totalPages - 1 ? "pointer-events-none opacity-40" : ""}`}
+                      title="Trang cuối"
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </PaginationLink>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>
