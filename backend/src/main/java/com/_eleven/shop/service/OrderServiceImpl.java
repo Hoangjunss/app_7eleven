@@ -7,6 +7,7 @@ import com._eleven.shop.dto.OrderRequest;
 import com._eleven.shop.dto.OrderResponse;
 import com._eleven.shop.entity.*;
 import com._eleven.shop.exception.InsufficientStockException;
+import com._eleven.shop.exception.ResourceNotFoundException;
 import com._eleven.shop.repository.OrderItemRepository;
 import com._eleven.shop.repository.OrderRepository;
 import com._eleven.shop.repository.ProductRepository;
@@ -48,12 +49,12 @@ public class OrderServiceImpl implements OrderService {
         // 1. Get user cart
         CartResponse cart = cartService.getCart(userId);
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Cart is empty");
+            throw new IllegalArgumentException("Cart is empty, cannot create order");
         }
 
         // 2. Fetch User
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // 3. Create Order Object
         Order order = Order.builder()
@@ -74,11 +75,10 @@ public class OrderServiceImpl implements OrderService {
         // 4. Process each cart item, check stock, and deduct
         for (CartItemResponse cartItem : cart.getItems()) {
             Product product = productRepository.findById(cartItem.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product with ID " + cartItem.getProductId() + " not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
             if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new InsufficientStockException("Insufficient stock for product: " + product.getName() + 
-                        " (Available: " + product.getStockQuantity() + ", Requested: " + cartItem.getQuantity() + ")");
+                throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
 
             // Deduct stock (optimistic locking will trigger via @Version on save if conflict occurs)
@@ -135,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponse getOrderDetails(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth != null && auth.getAuthorities().stream()
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void cancelOrder(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         if (!order.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("Unauthorized to cancel this order");
@@ -165,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
         // Return stock quantities
         for (OrderItem item : order.getItems()) {
             Product product = productRepository.findById(item.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found for reverting stock"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
             product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
             productRepository.save(product);
         }
@@ -196,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         return mapToOrderResponse(order);
     }
 
@@ -204,11 +204,11 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
         OrderStatus currentStatus = order.getStatus();
         if (!currentStatus.isValidTransitionTo(newStatus)) {
-            throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
+            throw new IllegalArgumentException("Invalid order status transition");
         }
 
         order.setStatus(newStatus);
@@ -221,7 +221,7 @@ public class OrderServiceImpl implements OrderService {
             // Revert stock quantities
             for (OrderItem item : order.getItems()) {
                 Product product = productRepository.findById(item.getProductId())
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found for reverting stock"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
                 product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
                 productRepository.save(product);
             }

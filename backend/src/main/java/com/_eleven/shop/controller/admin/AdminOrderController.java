@@ -43,7 +43,7 @@ public class AdminOrderController {
         return ApiResponse.success(order, "Order details retrieved successfully");
     }
 
-    @PatchMapping("/{id}/status")
+    @RequestMapping(value = "/{id}/status", method = {RequestMethod.PATCH, RequestMethod.PUT})
     @Auditable(action = "UPDATE_ORDER_STATUS", entityType = "ORDER")
     public ApiResponse<OrderResponse> updateOrderStatus(
             @PathVariable Long id,

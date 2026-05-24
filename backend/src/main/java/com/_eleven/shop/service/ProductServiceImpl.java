@@ -5,6 +5,7 @@ import com._eleven.shop.dto.ProductResponse;
 import com._eleven.shop.entity.Category;
 import com._eleven.shop.entity.Product;
 import com._eleven.shop.entity.ProductImage;
+import com._eleven.shop.exception.ResourceNotFoundException;
 import com._eleven.shop.mapper.ProductMapper;
 import com._eleven.shop.repository.CategoryRepository;
 import com._eleven.shop.repository.ProductRepository;
@@ -36,7 +37,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse createProduct(ProductRequest request, MultipartFile[] images, Integer primaryImageIndex) {
         if (productRepository.existsByNameIgnoreCaseAndTrimmed(request.getName())) {
-            throw new IllegalArgumentException("Tên sản phẩm này đã tồn tại trong hệ thống");
+            throw new IllegalArgumentException("Product name already exists");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
@@ -60,10 +61,10 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         if (productRepository.existsByNameIgnoreCaseAndTrimmedForUpdate(request.getName(), id)) {
-            throw new IllegalArgumentException("Tên sản phẩm này đã tồn tại trong hệ thống");
+            throw new IllegalArgumentException("Product name already exists");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
@@ -80,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         // Delete images from Cloudinary
         if (product.getImages() != null) {
@@ -99,7 +100,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return productMapper.toResponse(product);
     }
 
@@ -135,7 +136,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse uploadProductImages(Long productId, MultipartFile[] images, Integer primaryImageIndex) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         if (images != null && images.length > 0) {
             List<ProductImage> productImages = uploadAndAssociateImages(product, images, primaryImageIndex);

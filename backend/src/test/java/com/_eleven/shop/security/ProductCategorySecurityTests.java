@@ -250,7 +250,7 @@ public class ProductCategorySecurityTests {
         mockMvc.perform(post("/api/v1/admin/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         mockMvc.perform(put("/api/v1/admin/products/1")
                         .contentType(MediaType.APPLICATION_JSON)

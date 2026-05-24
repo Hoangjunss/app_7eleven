@@ -40,11 +40,18 @@ public class AdminUserController {
         return ApiResponse.success(user, "User roles updated successfully");
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/{id}/lock")
     @Auditable(action = "LOCK_USER", entityType = "USER")
-    public ApiResponse<Void> lockUser(@PathVariable Long id) {
+    public ApiResponse<Void> lockUserPut(@PathVariable Long id) {
         userService.lockUser(id);
         return ApiResponse.success(null, "User locked successfully");
+    }
+
+    @PutMapping("/{id}/restore")
+    @Auditable(action = "RESTORE_USER", entityType = "USER")
+    public ApiResponse<Void> restoreUserPut(@PathVariable Long id) {
+        userService.restoreUser(id);
+        return ApiResponse.success(null, "User restored successfully");
     }
 
     @PatchMapping("/{id}/restore")
@@ -52,5 +59,12 @@ public class AdminUserController {
     public ApiResponse<Void> restoreUser(@PathVariable Long id) {
         userService.restoreUser(id);
         return ApiResponse.success(null, "User restored successfully");
+    }
+
+    @DeleteMapping("/{id}")
+    @Auditable(action = "DELETE_USER", entityType = "USER")
+    public ApiResponse<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ApiResponse.success(null, "User deleted successfully");
     }
 }
