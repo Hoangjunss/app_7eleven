@@ -11,6 +11,7 @@ import com._eleven.shop.repository.CategoryRepository;
 import com._eleven.shop.repository.ProductRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = { "lowStockProducts", "topProductsMonth", "noOrderProducts" }, allEntries = true)
     public ProductResponse createProduct(ProductRequest request, MultipartFile[] images, Integer primaryImageIndex) {
         if (productRepository.existsByNameIgnoreCaseAndTrimmed(request.getName())) {
             throw new IllegalArgumentException("Product name already exists");
@@ -59,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = { "lowStockProducts", "topProductsMonth", "noOrderProducts" }, allEntries = true)
     public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -79,6 +82,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
+    @CacheEvict(value = { "lowStockProducts", "topProductsMonth", "noOrderProducts" }, allEntries = true)
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));

@@ -22,6 +22,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final OrderItemRepository orderItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final com._eleven.shop.mapper.ProductMapper productMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -153,5 +154,249 @@ public class DashboardServiceImpl implements DashboardService {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "revenueStats", key = "#startDate.toString() + '_' + #endDate.toString()")
+    public RevenueDashboardResponse getRevenueStats(OffsetDateTime startDate, OffsetDateTime endDate) {
+        BigDecimal totalRevenue = orderRepository.calculateTotalRevenueBetween(startDate, endDate);
+        if (totalRevenue == null) {
+            totalRevenue = BigDecimal.ZERO;
+        }
+
+        java.time.Duration duration = java.time.Duration.between(startDate, endDate);
+        OffsetDateTime prevStartDate = startDate.minus(duration);
+        OffsetDateTime prevEndDate = startDate;
+
+        BigDecimal previousRevenue = orderRepository.calculateTotalRevenueBetween(prevStartDate, prevEndDate);
+        if (previousRevenue == null) {
+            previousRevenue = BigDecimal.ZERO;
+        }
+
+        double percentageChange = 0.0;
+        if (previousRevenue.compareTo(BigDecimal.ZERO) > 0) {
+            percentageChange = totalRevenue.subtract(previousRevenue)
+                    .divide(previousRevenue, 4, java.math.RoundingMode.HALF_UP)
+                    .doubleValue() * 100.0;
+        } else if (totalRevenue.compareTo(BigDecimal.ZERO) > 0) {
+            percentageChange = 100.0;
+        }
+
+        List<RevenueChartResponse> chartData = getRevenueChart(startDate, endDate);
+
+        return RevenueDashboardResponse.builder()
+                .totalRevenue(totalRevenue)
+                .previousRevenue(previousRevenue)
+                .percentageChange(percentageChange)
+                .chartData(chartData)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "orderStats", key = "#startDate.toString() + '_' + #endDate.toString()")
+    public OrderStatsResponse getOrderStats(OffsetDateTime startDate, OffsetDateTime endDate) {
+        List<Object[]> currentCounts = orderRepository.countOrdersByStatusBetween(startDate, endDate);
+        long totalOrders = 0;
+        Map<String, Long> statusDistribution = new HashMap<>();
+        for (OrderStatus status : OrderStatus.values()) {
+            statusDistribution.put(status.name(), 0L);
+        }
+        for (Object[] row : currentCounts) {
+            OrderStatus status = (OrderStatus) row[0];
+            Long count = (Long) row[1];
+            statusDistribution.put(status.name(), count);
+            totalOrders += count;
+        }
+
+        java.time.Duration duration = java.time.Duration.between(startDate, endDate);
+        OffsetDateTime prevStartDate = startDate.minus(duration);
+        OffsetDateTime prevEndDate = startDate;
+
+        List<Object[]> prevCounts = orderRepository.countOrdersByStatusBetween(prevStartDate, prevEndDate);
+        long previousOrders = 0;
+        for (Object[] row : prevCounts) {
+            previousOrders += (Long) row[1];
+        }
+
+        double percentageChange = 0.0;
+        if (previousOrders > 0) {
+            percentageChange = ((double) (totalOrders - previousOrders) / previousOrders) * 100.0;
+        } else if (totalOrders > 0) {
+            percentageChange = 100.0;
+        }
+
+        return OrderStatsResponse.builder()
+                .totalOrders(totalOrders)
+                .previousOrders(previousOrders)
+                .percentageChange(percentageChange)
+                .statusDistribution(statusDistribution)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "topProductsMonth")
+    public List<TopProductResponse> getTopProductsThisMonth() {
+        OffsetDateTime now = OffsetDateTime.now();
+        OffsetDateTime startOfMonth = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        return orderItemRepository.findTopSellingProductsBetween(startOfMonth, now, PageRequest.of(0, 5));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "lowStockProducts")
+    public List<ProductResponse> getLowStockProducts() {
+        List<Product> products = productRepository.findLowStockProducts(PageRequest.of(0, 10));
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "noOrderProducts")
+    public List<ProductResponse> getNoOrderProducts30Days() {
+        OffsetDateTime sinceDate = OffsetDateTime.now().minusDays(30);
+        List<Product> products = productRepository.findProductsWithNoOrdersSince(sinceDate, PageRequest.of(0, 10));
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "userStats", key = "#startDate.toString() + '_' + #endDate.toString()")
+    public UserStatsResponse getUserStats(OffsetDateTime startDate, OffsetDateTime endDate) {
+        long totalUsers = userRepository.count();
+        long newUsers = userRepository.countNewUsersBetween(startDate, endDate);
+        long lockedUsers = userRepository.countLockedUsers();
+
+        List<Object[]> rows = userRepository.findUserRegistrationsChart(startDate, endDate);
+
+        Map<LocalDate, Long> registrationMap = new TreeMap<>();
+        LocalDate startLocalDate = startDate.toLocalDate();
+        LocalDate endLocalDate = endDate.toLocalDate();
+        for (LocalDate date = startLocalDate; !date.isAfter(endLocalDate); date = date.plusDays(1)) {
+            registrationMap.put(date, 0L);
+        }
+
+        for (Object[] row : rows) {
+            LocalDate dateVal = null;
+            if (row[0] instanceof java.sql.Date sqlDate) {
+                dateVal = sqlDate.toLocalDate();
+            } else if (row[0] instanceof java.time.LocalDate localDate) {
+                dateVal = localDate;
+            } else if (row[0] instanceof java.util.Date utilDate) {
+                dateVal = new java.sql.Date(utilDate.getTime()).toLocalDate();
+            }
+
+            Long count = 0L;
+            if (row[1] instanceof Number num) {
+                count = num.longValue();
+            }
+
+            if (dateVal != null && registrationMap.containsKey(dateVal)) {
+                registrationMap.put(dateVal, count);
+            }
+        }
+
+        List<UserRegistrationChartResponse> chartData = registrationMap.keySet().stream()
+                .map(date -> new UserRegistrationChartResponse(date.toString(), registrationMap.get(date)))
+                .collect(Collectors.toList());
+
+        return UserStatsResponse.builder()
+                .totalUsers(totalUsers)
+                .newUsers(newUsers)
+                .lockedUsers(lockedUsers)
+                .chartData(chartData)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @org.springframework.cache.annotation.Cacheable(value = "categoryRevenue", key = "#startDate.toString() + '_' + #endDate.toString()")
+    public List<CategoryRevenueResponse> getCategoryRevenues(OffsetDateTime startDate, OffsetDateTime endDate) {
+        return orderItemRepository.findCategoryRevenueBetween(startDate, endDate);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getRecentOrdersForUser(Long userId) {
+        org.springframework.data.domain.Page<Order> page = orderRepository.findByUserId(userId, PageRequest.of(0, 5, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")));
+        return page.getContent().stream()
+                .map(this::mapToOrderResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getProductSuggestionsForUser(Long userId) {
+        org.springframework.data.domain.Page<Order> userOrders = orderRepository.findByUserId(userId, PageRequest.of(0, 20, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")));
+        List<Order> orders = userOrders.getContent();
+
+        Set<Long> categoryIds = new HashSet<>();
+        Set<Long> purchasedProductIds = new HashSet<>();
+        for (Order order : orders) {
+            for (OrderItem item : order.getItems()) {
+                purchasedProductIds.add(item.getProductId());
+                productRepository.findById(item.getProductId()).ifPresent(p -> {
+                    if (p.getCategory() != null && p.getCategory().getDeletedAt() == null) {
+                        categoryIds.add(p.getCategory().getId());
+                    }
+                });
+            }
+        }
+
+        List<Product> suggestions = new ArrayList<>();
+        if (!categoryIds.isEmpty()) {
+            if (!purchasedProductIds.isEmpty()) {
+                suggestions = productRepository.findSuggestionsByCategory(categoryIds, purchasedProductIds, PageRequest.of(0, 5));
+            } else {
+                suggestions = productRepository.findSuggestionsByCategoryOnly(categoryIds, PageRequest.of(0, 5));
+            }
+        }
+
+        // Fallback: If not enough suggestions, fill with latest products (excluding already suggested and purchased products)
+        if (suggestions.size() < 5) {
+            Set<Long> excludeIds = new HashSet<>(purchasedProductIds);
+            for (Product p : suggestions) {
+                excludeIds.add(p.getId());
+            }
+
+            List<Product> latestProducts = productRepository.findLatestProducts(PageRequest.of(0, 20));
+            for (Product p : latestProducts) {
+                if (!excludeIds.contains(p.getId())) {
+                    suggestions.add(p);
+                    excludeIds.add(p.getId());
+                    if (suggestions.size() >= 5) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Final fallback if we still don't have enough, just add any latest products
+        if (suggestions.size() < 5) {
+            List<Product> latestProducts = productRepository.findLatestProducts(PageRequest.of(0, 5));
+            for (Product p : latestProducts) {
+                if (suggestions.stream().noneMatch(s -> s.getId().equals(p.getId()))) {
+                    suggestions.add(p);
+                    if (suggestions.size() >= 5) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Limit to 5
+        if (suggestions.size() > 5) {
+            suggestions = suggestions.subList(0, 5);
+        }
+
+        return suggestions.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }
