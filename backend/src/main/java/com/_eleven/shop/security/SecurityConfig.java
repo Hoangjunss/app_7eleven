@@ -17,7 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -27,6 +29,9 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Value("${cors.allowed.origins:http://localhost:3000,http://103.72.99.211:3000}")
+    private String allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,10 +66,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Restrict origins for security (Frontend domains)
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://103.72.99.211:3000"
-        ));
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .toList());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         configuration.setExposedHeaders(List.of("Authorization"));
