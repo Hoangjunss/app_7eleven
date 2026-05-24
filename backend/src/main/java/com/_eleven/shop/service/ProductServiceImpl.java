@@ -157,6 +157,8 @@ public class ProductServiceImpl implements ProductService {
                 continue;
             }
 
+            validateImageFile(file);
+
             String imageUrl = cloudinaryStorageService.uploadFile(file, "products");
 
             boolean isPrimary = !hasExistingPrimary && (i == primaryIndex);
@@ -170,6 +172,16 @@ public class ProductServiceImpl implements ProductService {
             productImages.add(productImage);
         }
         return productImages;
+    }
+
+    private void validateImageFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.equals("image/jpeg") &&
+                !contentType.equals("image/png") &&
+                !contentType.equals("image/webp") &&
+                !contentType.equals("image/gif"))) {
+            throw new IllegalArgumentException("Only JPEG, PNG, WEBP, and GIF images are allowed");
+        }
     }
 
     /**

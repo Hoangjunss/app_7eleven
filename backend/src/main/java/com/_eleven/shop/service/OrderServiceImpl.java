@@ -19,6 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -99,8 +102,18 @@ public class OrderServiceImpl implements OrderService {
         // 5. Persist Order (cascade will save order items)
         Order savedOrder = orderRepository.save(order);
 
-        // 6. Clear Redis Cart
-        cartService.clearCart(userId);
+        // 6. Clear Redis Cart only after DB transaction commits successfully
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    cartService.clearCart(userId);
+                    log.info("Redis cart cleared after successful transaction commit for user {}", userId);
+                }
+            });
+        } else {
+            cartService.clearCart(userId);
+        }
 
         log.info("Successfully created order with code {} for user {}", savedOrder.getOrderCode(), userId);
         return mapToOrderResponse(savedOrder);

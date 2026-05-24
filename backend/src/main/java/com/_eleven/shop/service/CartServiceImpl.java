@@ -51,10 +51,8 @@ public class CartServiceImpl implements CartService {
             throw new IllegalArgumentException("Quantity must be positive");
         }
         String key = cartKey(userId);
-        // Increment existing quantity or set new
-        Integer existing = hashOps().get(key, productId.toString());
-        int newQty = (existing == null) ? quantity : existing + quantity;
-        hashOps().put(key, productId.toString(), newQty);
+        // Increment existing quantity atomically
+        hashOps().increment(key, productId.toString(), quantity);
         redisTemplate.expire(key, CART_TTL);
     }
 

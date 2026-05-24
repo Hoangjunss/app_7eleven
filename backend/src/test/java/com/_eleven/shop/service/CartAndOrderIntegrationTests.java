@@ -171,8 +171,7 @@ public class CartAndOrderIntegrationTests {
     @Test
     void testCartOperations_AddItem() {
         cartService.addItemToCart(userId, product1Id, 5);
-        verify(hashOps, times(1)).get("cart:" + userId, product1Id.toString());
-        verify(hashOps, times(1)).put("cart:" + userId, product1Id.toString(), 5);
+        verify(hashOps, times(1)).increment("cart:" + userId, product1Id.toString(), 5);
         verify(redisTemplate, times(1)).expire(eq("cart:" + userId), any(Duration.class));
     }
 

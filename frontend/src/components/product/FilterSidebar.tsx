@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Search, RotateCcw, Filter } from "lucide-react";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -63,9 +64,56 @@ export default function FilterSidebar({
     return () => clearTimeout(handler);
   }, [localSearch, onSearchChange]);
 
+  const handleMinPriceChange = (val: string) => {
+    if (val && parseFloat(val) < 0) {
+      setLocalMinPrice("0");
+      toast.error("Giá tối thiểu không được nhỏ hơn 0");
+    } else {
+      setLocalMinPrice(val);
+    }
+  };
+
+  const handleMaxPriceChange = (val: string) => {
+    if (val && parseFloat(val) < 0) {
+      setLocalMaxPrice("0");
+      toast.error("Giá tối đa không được nhỏ hơn 0");
+    } else {
+      setLocalMaxPrice(val);
+    }
+  };
+
   const handleApplyPrice = (e: React.FormEvent) => {
     e.preventDefault();
-    onPriceChange(localMinPrice, localMaxPrice);
+    
+    let min = localMinPrice.trim();
+    let max = localMaxPrice.trim();
+
+    if (min && parseFloat(min) < 0) {
+      toast.error("Giá tối thiểu không được nhỏ hơn 0");
+      min = "0";
+      setLocalMinPrice("0");
+    }
+
+    if (max && parseFloat(max) < 0) {
+      toast.error("Giá tối đa không được nhỏ hơn 0");
+      max = "0";
+      setLocalMaxPrice("0");
+    }
+
+    if (min && max) {
+      const minVal = parseFloat(min);
+      const maxVal = parseFloat(max);
+      if (minVal > maxVal) {
+        toast.warning("Giá tối thiểu không được lớn hơn giá tối đa. Hệ thống đã hoán đổi 2 giá trị.");
+        const temp = min;
+        min = max;
+        max = temp;
+        setLocalMinPrice(min);
+        setLocalMaxPrice(max);
+      }
+    }
+
+    onPriceChange(min, max);
   };
 
   const handleResetClick = () => {
@@ -123,7 +171,11 @@ export default function FilterSidebar({
           onValueChange={(val) => onCategoryChange(val === "all" || !val ? "" : val)}
         >
           <SelectTrigger className="w-full bg-zinc-950/30 border-white/10 text-white rounded-lg h-9 cursor-pointer">
-            <SelectValue placeholder="Tất cả danh mục" />
+            <SelectValue placeholder="Tất cả danh mục">
+              {categoryId && categoryId !== "all"
+                ? (categories.find((cat) => cat.id.toString() === categoryId)?.name || (isLoadingCats ? "Đang tải danh mục..." : ""))
+                : "Tất cả danh mục"}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-[#18181b] border-white/10 text-white rounded-lg shadow-xl">
             <SelectItem value="all" className="hover:bg-white/5 cursor-pointer">Tất cả danh mục</SelectItem>
@@ -152,17 +204,19 @@ export default function FilterSidebar({
         <div className="flex items-center gap-2">
           <Input
             type="number"
+            min={0}
             placeholder="Min"
             value={localMinPrice}
-            onChange={(e) => setLocalMinPrice(e.target.value)}
+            onChange={(e) => handleMinPriceChange(e.target.value)}
             className="bg-zinc-950/30 border-white/10 text-white placeholder-zinc-550 rounded-lg h-9 w-full text-sm"
           />
           <span className="text-zinc-500 text-sm">—</span>
           <Input
             type="number"
+            min={0}
             placeholder="Max"
             value={localMaxPrice}
-            onChange={(e) => setLocalMaxPrice(e.target.value)}
+            onChange={(e) => handleMaxPriceChange(e.target.value)}
             className="bg-zinc-950/30 border-white/10 text-white placeholder-zinc-550 rounded-lg h-9 w-full text-sm"
           />
         </div>
