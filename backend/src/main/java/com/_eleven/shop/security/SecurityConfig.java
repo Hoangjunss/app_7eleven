@@ -30,12 +30,11 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Value("${cors.allowed.origins:http://localhost:3000,http://103.72.99.211:3000}")
-    private String allowedOrigins;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // Disable CSRF (Cross-Site Request Forgery) protection because the application uses stateless JWT authentication.
+            // No sessions or cookies are persisted on the server, making CSRF attacks inapplicable.
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -65,10 +64,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Restrict origins for security (Frontend domains)
-        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .toList());
+        // Hardcode allowed origins directly in code for local development and production deployments
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:3000",
+            "http://103.72.99.211:3000",
+            "https://test7eleven.online",
+            "https://admin.test7eleven.online",
+            "https://www.test7eleven.online"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         configuration.setExposedHeaders(List.of("Authorization"));
