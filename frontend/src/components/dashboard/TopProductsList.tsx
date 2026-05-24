@@ -1,7 +1,7 @@
-"use client";
-
 import React from "react";
 import { TopProductData } from "@/services/adminDashboardService";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 interface TopProductsListProps {
   data: TopProductData[] | undefined;
@@ -43,13 +43,18 @@ export default function TopProductsList({ data, isLoading }: TopProductsListProp
         return (
           <div key={product.productId} className="bg-white/5 border border-white/10 rounded-lg p-3 space-y-2 hover:bg-white/10 transition-colors">
             <div className="flex justify-between items-start">
-              <div className="pr-2">
+              <div className="pr-2 flex-grow">
                 <span className="text-xs font-semibold text-primary">Top {i + 1}</span>
-                <h3 className="text-sm font-semibold truncate max-w-[200px]" title={product.productName}>
-                  {product.productName}
-                </h3>
+                <Link
+                  href={`/products/${product.productId}`}
+                  className="flex items-center gap-1 text-sm font-semibold text-white hover:text-primary transition-colors cursor-pointer group/link"
+                  title={product.productName}
+                >
+                  <span className="truncate max-w-[160px]">{product.productName}</span>
+                  <ExternalLink size={12} className="shrink-0 opacity-50 group-hover/link:opacity-100 transition-opacity" />
+                </Link>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <span className="text-sm font-bold text-emerald-400">{product.totalQuantitySold} sản phẩm</span>
               </div>
             </div>

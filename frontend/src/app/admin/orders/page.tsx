@@ -55,6 +55,7 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [userIdInput, setUserIdInput] = useState("");
   const [userIdFilter, setUserIdFilter] = useState<number | undefined>(undefined);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Route guard – ADMIN only
@@ -89,7 +90,7 @@ export default function AdminOrdersPage() {
     status: statusFilter !== "all" ? (statusFilter as OrderStatus) : undefined,
     userId: userIdFilter,
     sortBy: "createdAt",
-    direction: "desc",
+    direction: sortDirection,
   });
 
   const orders = data?.data?.content ?? [];
@@ -133,8 +134,10 @@ export default function AdminOrdersPage() {
         </div>
 
         <Select value={statusFilter} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-52 bg-white/5 border-white/10 text-white h-9">
-            <SelectValue placeholder="Lọc theo trạng thái" />
+          <SelectTrigger className="w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
+            <SelectValue placeholder="Lọc theo trạng thái">
+              {statusFilter === "all" ? "Tất cả trạng thái" : (STATUS_OPTIONS.find(o => o.value === statusFilter)?.label || "")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-zinc-950 border-white/10 text-white">
             {STATUS_OPTIONS.map((opt) => (
@@ -142,6 +145,18 @@ export default function AdminOrdersPage() {
                 {opt.label}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={sortDirection} onValueChange={(val) => setSortDirection(val as "asc" | "desc")}>
+          <SelectTrigger className="w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
+            <SelectValue placeholder="Sắp xếp theo ngày">
+              {sortDirection === "desc" ? "Mới nhất trước" : "Cũ nhất trước"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent className="bg-zinc-950 border-white/10 text-white">
+            <SelectItem value="desc" className="hover:bg-white/5 focus:bg-white/5">Mới nhất trước</SelectItem>
+            <SelectItem value="asc" className="hover:bg-white/5 focus:bg-white/5">Cũ nhất trước</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -308,7 +308,11 @@ export default function AdminProductsPage() {
 
         <Select value={categoryFilter} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-full sm:w-52 bg-white/5 border-white/10 text-white h-9 rounded-lg">
-            <SelectValue placeholder="Lọc theo danh mục" />
+            <SelectValue placeholder="Lọc theo danh mục">
+              {categoryFilter === "all"
+                ? "Tất cả danh mục"
+                : (categories.find((cat) => cat.id.toString() === categoryFilter)?.name || "")}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-zinc-950 border-white/10 text-white">
             <SelectItem value="all">Tất cả danh mục</SelectItem>
@@ -480,14 +484,18 @@ export default function AdminProductsPage() {
         </>
       )}
 
-      {/* Form Dialog Modal (Create / Edit) */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="bg-zinc-950 border-white/10 text-white max-w-2xl overflow-y-auto max-h-[90vh]">
+        <DialogContent className="bg-zinc-950 border-white/10 text-white max-w-3xl md:max-w-4xl p-6 md:p-8 overflow-y-auto max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Package className="h-5 w-5 text-primary" />
               {currentProduct ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
             </DialogTitle>
+            {!currentProduct && (
+              <p className="text-xs text-primary/95 mt-2 font-medium bg-primary/10 border border-primary/20 px-3 py-2 rounded-lg">
+                💡 Bạn có thể thêm nhiều sản phẩm liên tiếp mà không cần tải lại trang.
+              </p>
+            )}
           </DialogHeader>
 
           <form onSubmit={handleSaveProduct} className="space-y-4 py-2">
@@ -498,7 +506,6 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Tên sản phẩm *</label>
                   <Input
                     required
-                    maxLength={255}
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="Nhập tên sản phẩm..."
@@ -537,7 +544,11 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Danh mục *</label>
                   <Select value={formCategory} onValueChange={(val) => val && setFormCategory(val)}>
                     <SelectTrigger className="bg-white/5 border-white/10 text-white h-9 rounded-lg">
-                      <SelectValue placeholder="Chọn danh mục" />
+                      <SelectValue placeholder="Chọn danh mục">
+                        {formCategory
+                          ? (categories.find((cat) => cat.id.toString() === formCategory)?.name || "")
+                          : "Chọn danh mục"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-950 border-white/10 text-white">
                       {categories.map((cat) => (
@@ -553,7 +564,6 @@ export default function AdminProductsPage() {
                   <label className="text-xs text-zinc-400 font-medium">Mô tả sản phẩm</label>
                   <textarea
                     rows={4}
-                    maxLength={2000}
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Mô tả sản phẩm chi tiết..."

@@ -35,7 +35,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (isAuthenticated) {
       if (role === "ADMIN") {
-        router.push("/admin/products");
+        router.push("/admin/dashboard");
       } else {
         router.push("/");
       }
@@ -61,7 +61,7 @@ export default function LoginPage() {
       toast.success("Login successful!");
       
       if (authResponse.roles.includes("ADMIN")) {
-        router.push("/admin/products");
+        router.push("/admin/dashboard");
       } else {
         router.push("/");
       }
