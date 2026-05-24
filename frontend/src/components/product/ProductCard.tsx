@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Product } from "@/services/productService";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductCardProps {
   product: Product;
@@ -80,3 +81,37 @@ export default function ProductCard({ product }: ProductCardProps) {
     </Card>
   );
 }
+
+export function ProductCardSkeleton() {
+  return (
+    <Card className="bg-white/5 border border-white/10 rounded-xl flex flex-col justify-between h-[380px]">
+      <div>
+        {/* Image Skeleton */}
+        <div className="relative w-full aspect-square overflow-hidden rounded-t-xl bg-zinc-900 border-b border-white/5">
+          <Skeleton className="w-full h-full bg-white/10" />
+        </div>
+
+        {/* Info Skeleton */}
+        <CardHeader className="pt-4 pb-2 px-4 space-y-2">
+          <Skeleton className="h-3 w-1/3 bg-white/10" />
+          <Skeleton className="h-6 w-full bg-white/10" />
+          <Skeleton className="h-4 w-3/4 bg-white/10" />
+        </CardHeader>
+      </div>
+
+      <div>
+        <CardContent className="px-4 pb-4">
+          <div className="flex items-baseline justify-between">
+            <Skeleton className="h-6 w-1/3 bg-white/10" />
+            <Skeleton className="h-4 w-1/4 bg-white/10" />
+          </div>
+        </CardContent>
+
+        <CardFooter className="p-4 pt-0">
+          <Skeleton className="h-9 w-full rounded-lg bg-white/10" />
+        </CardFooter>
+      </div>
+    </Card>
+  );
+}
+

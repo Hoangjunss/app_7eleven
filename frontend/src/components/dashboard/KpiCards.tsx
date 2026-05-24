@@ -3,6 +3,7 @@
 import React from "react";
 import { DollarSign, ShoppingBag, Package, Users } from "lucide-react";
 import { DashboardKpi } from "@/services/adminDashboardService";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface KpiCardsProps {
   kpi: DashboardKpi | undefined;
@@ -11,6 +12,24 @@ interface KpiCardsProps {
 }
 
 export default function KpiCards({ kpi, isLoading, formatVND }: KpiCardsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="bg-white/5 border border-white/10 rounded-xl p-5 backdrop-blur-md shadow-lg flex flex-col gap-3"
+          >
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-4 w-2/3 bg-white/10" />
+              <Skeleton className="h-5 w-5 rounded-full bg-white/10" />
+            </div>
+            <Skeleton className="h-8 w-1/2 bg-white/10 mt-1" />
+          </div>
+        ))}
+      </div>
+    );
+  }
   const cards = [
     {
       title: "Tổng Doanh Thu (Delivered)",

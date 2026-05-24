@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Trash2, Minus, Plus, Inbox } from "lucide-react";
+import { ShoppingCart, Trash2, Minus, Plus, Inbox, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface CartDrawerProps {
@@ -147,6 +147,7 @@ export default function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                           <Plus className="h-3 w-3" />
                         </button>
                       </div>
+                      {isLoading && <Loader2 className="h-3 w-3 text-primary animate-spin" />}
 
                       <button
                         disabled={isLoading}
