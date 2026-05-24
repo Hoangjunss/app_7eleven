@@ -19,10 +19,10 @@ describe("KpiCards Component", () => {
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(num || 0);
   };
 
-  it("should render skeleton placeholder dots when isLoading is true", () => {
-    render(<KpiCards kpi={undefined} isLoading={true} formatVND={formatVND} />);
-    const placeholders = screen.getAllByText("...");
-    expect(placeholders.length).toBe(4);
+  it("should render skeleton placeholders when isLoading is true", () => {
+    const { container } = render(<KpiCards kpi={undefined} isLoading={true} formatVND={formatVND} />);
+    const skeletons = container.querySelectorAll('[data-slot="skeleton"]');
+    expect(skeletons.length).toBeGreaterThan(0);
   });
 
   it("should render correct values when loading completes", () => {

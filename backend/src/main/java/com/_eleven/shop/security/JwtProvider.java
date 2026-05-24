@@ -89,4 +89,15 @@ public class JwtProvider {
         }
         return false;
     }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            return false;
+        } catch (ExpiredJwtException e) {
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

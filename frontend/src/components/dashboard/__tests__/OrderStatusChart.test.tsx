@@ -30,7 +30,7 @@ describe("OrderStatusChart Component", () => {
 
   it("should render loading placeholder when isLoading is true", () => {
     render(<OrderStatusChart kpi={undefined} isLoading={true} />);
-    expect(screen.getByText("Đang tải dữ liệu biểu đồ...")).toBeInTheDocument();
+    expect(screen.getByText("Đang tải dữ liệu...")).toBeInTheDocument();
   });
 
   it("should render empty state message when there are no orders with count > 0", () => {

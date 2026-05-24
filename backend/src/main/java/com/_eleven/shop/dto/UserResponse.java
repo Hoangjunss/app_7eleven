@@ -16,5 +16,6 @@ public class UserResponse {
     private List<String> roles;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
-    private OffsetDateTime deletedAt;
+    private boolean deleted;
+    private boolean locked;
 }

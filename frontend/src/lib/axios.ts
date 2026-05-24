@@ -31,7 +31,15 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const errorMsg = error.response?.data?.message || "Phiên đăng nhập hết hạn hoặc tài khoản bị khóa.";
+      const errorCode = error.response?.data?.errorCode;
+      let errorMsg = error.response?.data?.message || "Phiên đăng nhập hết hạn hoặc tài khoản bị khóa.";
+      
+      if (errorCode === "ACCOUNT_LOCKED") {
+        errorMsg = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.";
+      } else if (errorCode === "TOKEN_EXPIRED") {
+        errorMsg = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+      }
+
       // Clear token and user info from state and redirect to login
       useAuthStore.getState().logout();
       if (typeof window !== "undefined") {

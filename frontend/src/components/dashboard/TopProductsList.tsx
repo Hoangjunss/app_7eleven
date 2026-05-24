@@ -46,7 +46,7 @@ export default function TopProductsList({ data, isLoading }: TopProductsListProp
               <div className="pr-2 flex-grow">
                 <span className="text-xs font-semibold text-primary">Top {i + 1}</span>
                 <Link
-                  href={`/products/${product.productId}`}
+                  href={`/admin/products?highlight=${product.productId}`}
                   className="flex items-center gap-1 text-sm font-semibold text-white hover:text-primary transition-colors cursor-pointer group/link"
                   title={product.productName}
                 >

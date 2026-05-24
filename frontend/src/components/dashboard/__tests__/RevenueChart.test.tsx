@@ -26,7 +26,7 @@ describe("RevenueChart Component", () => {
 
   it("should render loading placeholder when isLoading is true", () => {
     render(<RevenueChart data={undefined} isLoading={true} formatVND={formatVND} />);
-    expect(screen.getByText("Đang tải dữ liệu biểu đồ...")).toBeInTheDocument();
+    expect(screen.getByText("Đang tải dữ liệu...")).toBeInTheDocument();
   });
 
   it("should render chart canvas and elements when loaded", () => {

@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { useCategories } from "@/hooks/useCategories";
 import {
   useAdminProducts,
+  useAdminProductDetail,
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
@@ -58,6 +59,8 @@ import {
   Check,
   X,
   Loader2,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -65,7 +68,11 @@ const PAGE_SIZE = 10;
 
 export default function AdminProductsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, role } = useAuthStore();
+
+  const highlightId = searchParams.get("highlight");
+  const { data: highlightedProductData } = useAdminProductDetail(highlightId ? parseInt(highlightId, 10) : "");
 
   // Route guard – ADMIN only
   useEffect(() => {
@@ -193,6 +200,14 @@ export default function AdminProductsPage() {
     setFormDescription(product.description || "");
     setIsFormOpen(true);
   };
+
+  useEffect(() => {
+    if (highlightedProductData?.data) {
+      handleOpenEditModal(highlightedProductData.data);
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [highlightedProductData]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -491,6 +506,19 @@ export default function AdminProductsPage() {
             <div className="mt-6 flex justify-center">
               <Pagination>
                 <PaginationContent>
+                  {/* Trang đầu */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => setPage(0)}
+                      className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${
+                        page === 0 ? "pointer-events-none opacity-40" : ""
+                      }`}
+                      title="Trang đầu"
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+
                   <PaginationItem>
                     <PaginationPrevious
                       onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -525,6 +553,19 @@ export default function AdminProductsPage() {
                         page >= totalPages - 1 ? "pointer-events-none opacity-40" : ""
                       }`}
                     />
+                  </PaginationItem>
+
+                  {/* Trang cuối */}
+                  <PaginationItem>
+                    <PaginationLink
+                      onClick={() => setPage(totalPages - 1)}
+                      className={`cursor-pointer text-zinc-400 hover:text-white hover:bg-white/5 ${
+                        page >= totalPages - 1 ? "pointer-events-none opacity-40" : ""
+                      }`}
+                      title="Trang cuối"
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </PaginationLink>
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

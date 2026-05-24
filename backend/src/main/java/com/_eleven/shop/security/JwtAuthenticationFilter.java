@@ -1,6 +1,7 @@
 package com._eleven.shop.security;
 
 import com._eleven.shop.repository.UserRepository;
+import com._eleven.shop.entity.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -32,33 +34,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = getJwtFromRequest(request);
 
-        if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
-            String username = jwtProvider.getUsernameFromToken(token);
+        if (StringUtils.hasText(token)) {
+            if (jwtProvider.validateToken(token)) {
+                String username = jwtProvider.getUsernameFromToken(token);
 
-            // Verify if user exists and is active (not soft deleted/locked) in database
-            if (!userRepository.existsByEmail(username)) {
+                Optional<User> userOpt = userRepository.findByEmailWithDeleted(username);
+                if (userOpt.isEmpty() || userOpt.get().isDeleted()) {
+                    SecurityContextHolder.clearContext();
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"errorCode\":\"ACCOUNT_LOCKED\",\"message\":\"Tài khoản của bạn không tồn tại trong hệ thống.\",\"status\":401}");
+                    return;
+                }
+
+                if (userOpt.get().isLocked()) {
+                    SecurityContextHolder.clearContext();
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("{\"errorCode\":\"ACCOUNT_LOCKED\",\"message\":\"Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.\",\"status\":401}");
+                    return;
+                }
+
+                List<String> roles = jwtProvider.getRolesFromToken(token);
+
+                List<GrantedAuthority> authorities = roles.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+                org.springframework.security.core.userdetails.UserDetails userDetails = 
+                        new org.springframework.security.core.userdetails.User(username, "", authorities);
+
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, authorities
+                );
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else if (jwtProvider.isTokenExpired(token)) {
                 SecurityContextHolder.clearContext();
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"message\":\"Tài khoản của bạn vừa bị khóa. Vui lòng liên hệ quản trị viên.\",\"status\":401}");
+                response.getWriter().write("{\"errorCode\":\"TOKEN_EXPIRED\",\"message\":\"Phiên đăng nhập đã hết hạn\",\"status\":401}");
                 return;
             }
-
-            List<String> roles = jwtProvider.getRolesFromToken(token);
-
-            List<GrantedAuthority> authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-
-            org.springframework.security.core.userdetails.UserDetails userDetails = 
-                    new org.springframework.security.core.userdetails.User(username, "", authorities);
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, authorities
-            );
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);
