@@ -147,13 +147,8 @@ export default function Header() {
                     <DropdownMenuSeparator className="bg-white/10" />
                     {!isAdminPage && (
                       <DropdownMenuItem
-                        render={
-                          <button
-                            onClick={() => setCartDrawerOpen(true)}
-                            className="flex w-full items-center gap-2"
-                          />
-                        }
-                        className="hover:bg-white/5 cursor-pointer"
+                        onClick={() => setCartDrawerOpen(true)}
+                        className="hover:bg-white/5 cursor-pointer flex w-full items-center gap-2"
                       >
                         <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                         Giỏ hàng
