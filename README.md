@@ -28,7 +28,6 @@ Hệ thống E-commerce nguyên khối (Monolithic), hiệu năng cao, được 
 Ứng dụng đã được cấu hình và chạy thực tế trên Cloud VPS. Bạn có thể kiểm tra trực tiếp các giao diện thông qua các liên kết dưới đây:
 
 *   **Trang Mua Sắm (Customer):** [https://test7eleven.online](https://test7eleven.online)
-*   **Trang Quản Trị (Admin):** [https://admin.test7eleven.online](https://admin.test7eleven.online)
 
 ### 🔑 Tài Khoản Đăng Nhập
 
