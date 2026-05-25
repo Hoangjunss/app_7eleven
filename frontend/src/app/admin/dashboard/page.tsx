@@ -4,8 +4,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
   useDashboardRevenueStats,
   useDashboardOrderStats,
-  useDashboardLowStock,
-  useDashboardNoOrders,
   useDashboardUserStats,
   useDashboardCategoryRevenue,
   useDashboardTopProducts,
@@ -93,8 +91,6 @@ export default function AdminDashboardPage() {
   const { data: orderStats, isLoading: isOrderStatsLoading } = useDashboardOrderStats(startDate, endDate);
   const { data: userStats, isLoading: isUserStatsLoading } = useDashboardUserStats(startDate, endDate);
   const { data: categoryRevenue, isLoading: isCategoryLoading } = useDashboardCategoryRevenue(startDate, endDate);
-  const { data: lowStock, isLoading: isLowStockLoading } = useDashboardLowStock();
-  const { data: noOrders, isLoading: isNoOrdersLoading } = useDashboardNoOrders();
   const { data: topProducts, isLoading: isTopLoading } = useDashboardTopProducts(startDate, endDate);
   const { data: recentOrders, isLoading: isRecentLoading } = useDashboardRecentOrders(5);
 
@@ -443,84 +439,75 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Grid: Lists & Warnings */}
+      {/* Grid: Recent Orders & Top Sold Products */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Low Stock Warning */}
-        <div className="bg-[#09090b]/40 border border-white/10 rounded-xl p-5 backdrop-blur-md">
-          <h2 className="text-lg font-semibold mb-4 text-amber-500 flex items-center gap-2">
-            <AlertTriangle size={18} /> Cảnh báo Sắp hết hàng
-          </h2>
-          <div className="overflow-y-auto max-h-72">
-            {isLowStockLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white/5 h-12 rounded-lg" />
-                ))}
-              </div>
-            ) : lowStock && lowStock.length > 0 ? (
-              <div className="space-y-3">
-                {lowStock.map((prod: any) => (
-                  <div
-                    key={prod.id}
-                    className="p-3 bg-white/5 border border-white/10 rounded-lg flex justify-between items-center"
-                  >
-                    <div>
-                      <h4 className="text-xs font-semibold text-white truncate max-w-xs">{prod.name}</h4>
-                      <p className="text-[10px] text-zinc-400 mt-0.5">{prod.categoryName}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400">
-                        Còn lại {prod.stockQuantity}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-zinc-500 text-sm text-center py-6">Tất cả sản phẩm đều đủ hàng.</p>
-            )}
+        {/* Recent Orders table */}
+        <div className="lg:col-span-2 bg-[#09090b]/40 border border-white/10 rounded-xl p-5 backdrop-blur-md">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <ShoppingBag size={18} /> Đơn hàng gần đây
+            </h2>
+            <Link href="/admin/orders" className="text-primary hover:underline text-xs flex items-center gap-1">
+              Xem tất cả đơn hàng <ExternalLink size={12} />
+            </Link>
           </div>
-        </div>
 
-        {/* Slow Moving Products */}
-        <div className="bg-[#09090b]/40 border border-white/10 rounded-xl p-5 backdrop-blur-md">
-          <h2 className="text-lg font-semibold mb-4 text-zinc-400 flex items-center gap-2">
-            <Package size={18} /> Sản phẩm Tồn kho & Không bán chạy
-          </h2>
-          <div className="overflow-y-auto max-h-72">
-            {isNoOrdersLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white/5 h-12 rounded-lg" />
-                ))}
-              </div>
-            ) : noOrders && noOrders.length > 0 ? (
-              <div className="space-y-3">
-                {noOrders.map((prod: any) => (
-                  <div
-                    key={prod.id}
-                    className="p-3 bg-white/5 border border-white/10 rounded-lg flex justify-between items-center"
-                  >
-                    <div>
-                      <h4 className="text-xs font-semibold text-white truncate max-w-xs">{prod.name}</h4>
-                      <p className="text-[10px] text-zinc-400 mt-0.5">{prod.categoryName}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded">
-                        30 ngày không có đơn
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-zinc-500 text-sm text-center py-6">Không có sản phẩm chậm trong 30 ngày.</p>
-            )}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-xs text-zinc-400 border-b border-white/10 uppercase">
+                <tr>
+                  <th className="py-3">Mã đơn</th>
+                  <th className="py-3">Khách hàng</th>
+                  <th className="py-3">Tổng tiền</th>
+                  <th className="py-3">Trạng thái</th>
+                  <th className="py-3">Thời gian</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {isRecentLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-16" /></td>
+                      <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-24" /></td>
+                      <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-20" /></td>
+                      <td className="py-3.5"><div className="h-6 bg-white/5 rounded-full w-16" /></td>
+                      <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-20" /></td>
+                    </tr>
+                  ))
+                ) : recentOrders && recentOrders.length > 0 ? (
+                  recentOrders.map((order) => (
+                    <tr key={order.id} className="hover:bg-white/5 transition-colors">
+                      <td className="py-3.5 font-medium text-primary">
+                        <Link href={`/admin/orders/${order.id}`}>{order.orderCode}</Link>
+                      </td>
+                      <td className="py-3.5">{order.recipientName}</td>
+                      <td className="py-3.5 font-semibold text-emerald-400">{formatVND(order.totalAmount)}</td>
+                      <td className="py-3.5">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          order.status === "DELIVERED" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" :
+                          order.status === "CANCELLED" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" :
+                          order.status === "SHIPPING" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" :
+                          order.status === "CONFIRMED" ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" :
+                          "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                        }`}>
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="py-3.5 text-zinc-400">{new Date(order.createdAt).toLocaleDateString("vi-VN")}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-zinc-500">Chưa có đơn hàng nào.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
         {/* Top Sold Products */}
-        <div className="bg-[#09090b]/40 border border-white/10 rounded-xl p-5 backdrop-blur-md">
+        <div className="bg-[#09090b]/40 border border-white/10 rounded-xl p-5 backdrop-blur-md flex flex-col justify-between">
           <h2 className="text-lg font-semibold mb-4 text-emerald-400 flex items-center gap-2">
             <TrendingUp size={18} /> Top 5 Bán chạy
           </h2>
@@ -556,71 +543,6 @@ export default function AdminDashboardPage() {
               <p className="text-zinc-500 text-sm text-center py-6">Không có dữ liệu bán chạy.</p>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Recent Orders table */}
-      <div className="bg-[#09090b]/40 border border-white/10 rounded-xl p-5 backdrop-blur-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <ShoppingBag size={18} /> Đơn hàng gần đây
-          </h2>
-          <Link href="/admin/orders" className="text-primary hover:underline text-xs flex items-center gap-1">
-            Xem tất cả đơn hàng <ExternalLink size={12} />
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-zinc-400 border-b border-white/10 uppercase">
-              <tr>
-                <th className="py-3">Mã đơn</th>
-                <th className="py-3">Khách hàng</th>
-                <th className="py-3">Tổng tiền</th>
-                <th className="py-3">Trạng thái</th>
-                <th className="py-3">Thời gian</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {isRecentLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-16" /></td>
-                    <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-24" /></td>
-                    <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-20" /></td>
-                    <td className="py-3.5"><div className="h-6 bg-white/5 rounded-full w-16" /></td>
-                    <td className="py-3.5"><div className="h-4 bg-white/5 rounded w-20" /></td>
-                  </tr>
-                ))
-              ) : recentOrders && recentOrders.length > 0 ? (
-                recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-white/5 transition-colors">
-                    <td className="py-3.5 font-medium text-primary">
-                      <Link href={`/admin/orders/${order.id}`}>{order.orderCode}</Link>
-                    </td>
-                    <td className="py-3.5">{order.recipientName}</td>
-                    <td className="py-3.5 font-semibold text-emerald-400">{formatVND(order.totalAmount)}</td>
-                    <td className="py-3.5">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        order.status === "DELIVERED" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" :
-                        order.status === "CANCELLED" ? "bg-rose-500/20 text-rose-400 border border-rose-500/30" :
-                        order.status === "SHIPPING" ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" :
-                        order.status === "CONFIRMED" ? "bg-indigo-500/20 text-indigo-400 border border-indigo-500/30" :
-                        "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="py-3.5 text-zinc-400">{new Date(order.createdAt).toLocaleDateString("vi-VN")}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="py-8 text-center text-zinc-500">Chưa có đơn hàng nào.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
       </div>
     </div>

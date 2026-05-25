@@ -225,32 +225,6 @@ public class DashboardServiceTests {
     }
 
     @Test
-    void testGetLowStockProducts() {
-        com._eleven.shop.entity.Product product = com._eleven.shop.entity.Product.builder().id(1L).name("P1").build();
-        com._eleven.shop.dto.product.ProductResponse response = com._eleven.shop.dto.product.ProductResponse.builder().id(1L).name("P1").build();
-
-        when(productRepository.findLowStockProducts(PageRequest.of(0, 10))).thenReturn(List.of(product));
-        when(productMapper.toResponse(product)).thenReturn(response);
-
-        List<com._eleven.shop.dto.product.ProductResponse> result = dashboardService.getLowStockProducts();
-        assertEquals(1, result.size());
-        assertEquals("P1", result.get(0).getName());
-    }
-
-    @Test
-    void testGetNoOrderProducts30Days() {
-        com._eleven.shop.entity.Product product = com._eleven.shop.entity.Product.builder().id(1L).name("P2").build();
-        com._eleven.shop.dto.product.ProductResponse response = com._eleven.shop.dto.product.ProductResponse.builder().id(1L).name("P2").build();
-
-        when(productRepository.findProductsWithNoOrdersSince(any(), eq(PageRequest.of(0, 10)))).thenReturn(List.of(product));
-        when(productMapper.toResponse(product)).thenReturn(response);
-
-        List<com._eleven.shop.dto.product.ProductResponse> result = dashboardService.getNoOrderProducts30Days();
-        assertEquals(1, result.size());
-        assertEquals("P2", result.get(0).getName());
-    }
-
-    @Test
     void testGetUserStats() {
         OffsetDateTime end = OffsetDateTime.now();
         OffsetDateTime start = end.minusDays(2).withHour(0).withMinute(0).withSecond(0).withNano(0);

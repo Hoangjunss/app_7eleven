@@ -51,21 +51,6 @@ export function useDashboardOrderStats(startDate: string, endDate: string) {
   });
 }
 
-export function useDashboardLowStock() {
-  return useQuery({
-    queryKey: ["adminDashboard", "lowStock"],
-    queryFn: () => adminDashboardService.getLowStockProducts(),
-    staleTime: STALE_TIME,
-  });
-}
-
-export function useDashboardNoOrders() {
-  return useQuery({
-    queryKey: ["adminDashboard", "noOrders"],
-    queryFn: () => adminDashboardService.getNoOrderProducts(),
-    staleTime: STALE_TIME,
-  });
-}
 
 export function useDashboardUserStats(startDate: string, endDate: string) {
   return useQuery({

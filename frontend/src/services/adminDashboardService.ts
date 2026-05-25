@@ -65,15 +65,6 @@ export const adminDashboardService = {
     return res.data.data;
   },
 
-  getLowStockProducts: async (): Promise<any> => {
-    const res = await apiClient.get(`/admin/dashboard/low-stock`);
-    return res.data.data;
-  },
-
-  getNoOrderProducts: async (): Promise<any> => {
-    const res = await apiClient.get(`/admin/dashboard/no-orders`);
-    return res.data.data;
-  },
 
   getUserStats: async (startDate: string, endDate: string): Promise<any> => {
     const res = await apiClient.get(`/admin/dashboard/user-stats`, {

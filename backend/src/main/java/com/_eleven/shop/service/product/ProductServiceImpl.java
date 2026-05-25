@@ -59,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
             product = productRepository.save(product);
         }
 
-        cacheEvictionService.evictAfterCommit("lowStockProducts", "topProductsMonth", "noOrderProducts");
+        cacheEvictionService.evictAfterCommit("topProductsMonth");
         return productMapper.toResponse(product);
     }
 
@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
 
         product = productRepository.save(product);
-        cacheEvictionService.evictAfterCommit("lowStockProducts", "topProductsMonth", "noOrderProducts");
+        cacheEvictionService.evictAfterCommit("topProductsMonth");
         return productMapper.toResponse(product);
     }
 
@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.delete(product);
-        cacheEvictionService.evictAfterCommit("lowStockProducts", "topProductsMonth", "noOrderProducts");
+        cacheEvictionService.evictAfterCommit("topProductsMonth");
     }
 
     @Override
