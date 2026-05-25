@@ -98,6 +98,9 @@ Thiết kế theo mô hình phân lớp chuẩn (Layered Architecture):
 *   **Cơ Chế Soft Delete (Xóa Mềm):**
     *   *Mô tả:* Sử dụng `@SQLDelete` và `@SQLRestriction` trong Hibernate để đánh dấu trường `deleted_at` hoặc trạng thái `deleted = true` thay vì xóa vật lý bản ghi.
     *   *Lý do:* Bảo toàn lịch sử dữ liệu (đặc biệt là đơn hàng và thống kê tài chính), tránh phá vỡ ràng buộc khóa ngoại (Foreign Key) nhưng vẫn đảm bảo client không truy vấn phải sản phẩm đã ẩn.
+*   **Transaction-Synchronized Cache Eviction (Xóa Cache Đồng Bộ Giao Dịch):**
+    *   *Mô tả:* Chuyển đổi cơ chế xóa cache từ khai báo `@CacheEvict` mặc định sang sử dụng `CacheEvictionService` lập trình. Dịch vụ này đăng ký một `TransactionSynchronization` qua `TransactionSynchronizationManager` để chỉ thực thi việc xóa (eviction) các namespace cache Redis (`revenueStats`, `orderStats`, `topProductsMonth`, `categoryRevenue`, `noOrderProducts`, `lowStockProducts`) ở callback `afterCommit()` sau khi giao dịch cơ sở dữ liệu PostgreSQL đã được commit thành công.
+    *   *Lý do:* Giải quyết triệt để lỗi tranh chấp dữ liệu (Race Condition) trong môi trường đồng thời, nơi các request dashboard tiếp theo đọc dữ liệu cũ và ghi đè cache cũ vào Redis trước khi giao dịch tạo hoặc cập nhật đơn hàng kịp commit vào PostgreSQL.
 
 ---
 
