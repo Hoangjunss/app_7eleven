@@ -12,11 +12,11 @@ import com._eleven.shop.exception.ResourceNotFoundException;
 import com._eleven.shop.repository.order.OrderItemRepository;
 import com._eleven.shop.repository.order.OrderRepository;
 import com._eleven.shop.repository.product.ProductRepository;
+import com._eleven.shop.common.cache.CacheEvictionService;
 import com._eleven.shop.repository.user.UserRepository;
 import com._eleven.shop.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -43,11 +43,11 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CartService cartService;
+    private final CacheEvictionService cacheEvictionService;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Override
     @Transactional
-    @CacheEvict(value = { "revenueStats", "orderStats", "topProductsMonth", "categoryRevenue", "noOrderProducts" }, allEntries = true)
     public OrderResponse createOrder(Long userId, OrderRequest request) {
         // 1. Get user cart
         CartResponse cart = cartService.getCart(userId);
@@ -78,6 +78,10 @@ public class OrderServiceImpl implements OrderService {
         clearCartAfterCommit(userId);
 
         log.info("Successfully created order with code {} for user {}", savedOrder.getOrderCode(), userId);
+        cacheEvictionService.evictAfterCommit(
+                "revenueStats", "orderStats", "topProductsMonth",
+                "categoryRevenue", "noOrderProducts", "lowStockProducts"
+        );
         return mapToOrderResponse(savedOrder);
     }
 
@@ -187,7 +191,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CacheEvict(value = { "revenueStats", "orderStats", "topProductsMonth", "categoryRevenue", "noOrderProducts" }, allEntries = true)
     public void cancelOrder(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ORDER_NOT_FOUND));
@@ -212,6 +215,10 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentStatus(PaymentStatus.CANCELLED);
         orderRepository.save(order);
         log.info("Order with ID {} was cancelled by user {}", orderId, userId);
+        cacheEvictionService.evictAfterCommit(
+                "revenueStats", "orderStats", "topProductsMonth",
+                "categoryRevenue", "noOrderProducts", "lowStockProducts"
+        );
     }
 
     @Override
@@ -240,7 +247,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    @CacheEvict(value = { "revenueStats", "orderStats", "topProductsMonth", "categoryRevenue", "noOrderProducts" }, allEntries = true)
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.ORDER_NOT_FOUND));
@@ -268,6 +274,10 @@ public class OrderServiceImpl implements OrderService {
 
         Order updatedOrder = orderRepository.save(order);
         log.info("Order status with ID {} updated from {} to {}", orderId, currentStatus, newStatus);
+        cacheEvictionService.evictAfterCommit(
+                "revenueStats", "orderStats", "topProductsMonth",
+                "categoryRevenue", "noOrderProducts", "lowStockProducts"
+        );
         return mapToOrderResponse(updatedOrder);
     }
 

@@ -44,6 +44,9 @@ public class ProductServiceTests {
     @Mock
     private CloudinaryStorageService cloudinaryStorageService;
 
+    @Mock
+    private com._eleven.shop.common.cache.CacheEvictionService cacheEvictionService;
+
     @InjectMocks
     private ProductServiceImpl productService;
 
