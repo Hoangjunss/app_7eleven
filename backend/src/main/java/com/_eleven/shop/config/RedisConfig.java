@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
+@Slf4j
 public class RedisConfig {
 
     @Bean
@@ -55,6 +57,7 @@ public class RedisConfig {
     }
 
     private GenericJackson2JsonRedisSerializer createJackson2JsonRedisSerializer() {
+        log.info("✅ Using custom Redis serializer with JavaTimeModule");
         ObjectMapper objectMapper = new ObjectMapper();
         
         // Register JavaTimeModule to support Java 8 Date/Time types (such as OffsetDateTime)
