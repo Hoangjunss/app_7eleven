@@ -54,6 +54,9 @@ public class OrderServiceTests {
     @Mock
     private CartService cartService;
 
+    @Mock
+    private com._eleven.shop.common.cache.CacheEvictionService cacheEvictionService;
+
     @InjectMocks
     private OrderServiceImpl orderService;
 

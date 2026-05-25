@@ -13,7 +13,6 @@ import com._eleven.shop.repository.category.CategoryRepository;
 import com._eleven.shop.repository.product.ProductRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com._eleven.shop.service.CloudinaryStorageService;
+import com._eleven.shop.common.cache.CacheEvictionService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,10 +36,10 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
     private final CloudinaryStorageService cloudinaryStorageService;
+    private final CacheEvictionService cacheEvictionService;
 
     @Override
     @Transactional
-    @CacheEvict(value = { "lowStockProducts", "topProductsMonth", "noOrderProducts" }, allEntries = true)
     public ProductResponse createProduct(ProductRequest request, MultipartFile[] images, Integer primaryImageIndex) {
         if (productRepository.existsByNameIgnoreCaseAndTrimmed(request.getName())) {
             throw new IllegalArgumentException(MessageConstants.PRODUCT_NAME_EXISTS);
@@ -59,12 +59,12 @@ public class ProductServiceImpl implements ProductService {
             product = productRepository.save(product);
         }
 
+        cacheEvictionService.evictAfterCommit("lowStockProducts", "topProductsMonth", "noOrderProducts");
         return productMapper.toResponse(product);
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = { "lowStockProducts", "topProductsMonth", "noOrderProducts" }, allEntries = true)
     public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.PRODUCT_NOT_FOUND));
@@ -80,12 +80,12 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
 
         product = productRepository.save(product);
+        cacheEvictionService.evictAfterCommit("lowStockProducts", "topProductsMonth", "noOrderProducts");
         return productMapper.toResponse(product);
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = { "lowStockProducts", "topProductsMonth", "noOrderProducts" }, allEntries = true)
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(MessageConstants.PRODUCT_NOT_FOUND));
@@ -101,6 +101,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.delete(product);
+        cacheEvictionService.evictAfterCommit("lowStockProducts", "topProductsMonth", "noOrderProducts");
     }
 
     @Override
