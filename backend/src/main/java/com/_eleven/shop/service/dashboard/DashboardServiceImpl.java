@@ -264,27 +264,6 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    @org.springframework.cache.annotation.Cacheable(value = "lowStockProducts")
-    public List<ProductResponse> getLowStockProducts() {
-        List<Product> products = productRepository.findLowStockProducts(PageRequest.of(0, 10));
-        return products.stream()
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    @org.springframework.cache.annotation.Cacheable(value = "noOrderProducts")
-    public List<ProductResponse> getNoOrderProducts30Days() {
-        OffsetDateTime sinceDate = OffsetDateTime.now().minusDays(30);
-        List<Product> products = productRepository.findProductsWithNoOrdersSince(sinceDate, PageRequest.of(0, 10));
-        return products.stream()
-                .map(productMapper::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     @org.springframework.cache.annotation.Cacheable(value = "userStats", key = "#startDate.toString() + '_' + #endDate.toString()")
     public UserStatsResponse getUserStats(OffsetDateTime startDate, OffsetDateTime endDate) {
         long totalUsers = userRepository.count();

@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("Successfully created order with code {} for user {}", savedOrder.getOrderCode(), userId);
         cacheEvictionService.evictAfterCommit(
                 "revenueStats", "orderStats", "topProductsMonth",
-                "categoryRevenue", "noOrderProducts", "lowStockProducts"
+                "categoryRevenue"
         );
         return mapToOrderResponse(savedOrder);
     }
@@ -217,7 +217,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order with ID {} was cancelled by user {}", orderId, userId);
         cacheEvictionService.evictAfterCommit(
                 "revenueStats", "orderStats", "topProductsMonth",
-                "categoryRevenue", "noOrderProducts", "lowStockProducts"
+                "categoryRevenue"
         );
     }
 
@@ -276,7 +276,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order status with ID {} updated from {} to {}", orderId, currentStatus, newStatus);
         cacheEvictionService.evictAfterCommit(
                 "revenueStats", "orderStats", "topProductsMonth",
-                "categoryRevenue", "noOrderProducts", "lowStockProducts"
+                "categoryRevenue"
         );
         return mapToOrderResponse(updatedOrder);
     }

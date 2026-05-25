@@ -21,8 +21,6 @@ public interface DashboardService {
     RevenueDashboardResponse getRevenueStats(OffsetDateTime startDate, OffsetDateTime endDate);
     OrderStatsResponse getOrderStats(OffsetDateTime startDate, OffsetDateTime endDate);
     List<TopProductResponse> getTopProductsThisMonth();
-    List<ProductResponse> getLowStockProducts();
-    List<ProductResponse> getNoOrderProducts30Days();
     UserStatsResponse getUserStats(OffsetDateTime startDate, OffsetDateTime endDate);
     List<CategoryRevenueResponse> getCategoryRevenues(OffsetDateTime startDate, OffsetDateTime endDate);
     List<OrderResponse> getRecentOrdersForUser(Long userId);

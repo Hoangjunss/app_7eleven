@@ -112,26 +112,6 @@ public class AdminDashboardControllerTests {
 
     @Test
     @WithMockUser(username = "admin@test.com", roles = "ADMIN")
-    void testGetLowStock() throws Exception {
-        Mockito.when(dashboardService.getLowStockProducts())
-                .thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/api/v1/admin/dashboard/low-stock"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
-    void testGetNoOrders() throws Exception {
-        Mockito.when(dashboardService.getNoOrderProducts30Days())
-                .thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/api/v1/admin/dashboard/no-orders"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(username = "admin@test.com", roles = "ADMIN")
     void testGetUserStats() throws Exception {
         Mockito.when(dashboardService.getUserStats(any(), any()))
                 .thenReturn(UserStatsResponse.builder().totalUsers(10L).build());
