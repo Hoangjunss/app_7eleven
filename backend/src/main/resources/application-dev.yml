@@ -25,6 +25,8 @@ logging:
   level:
     root: INFO
     com._eleven.shop: DEBUG
+    org.springframework.data.redis: DEBUG
+    org.springframework.cache: TRACE
 
 cors:
   allowed:
