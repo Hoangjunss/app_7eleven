@@ -273,6 +273,20 @@ Dưới đây là chi tiết 10 vấn đề kỹ thuật và kiến trúc cốt 
     *   *Ưu điểm:* Cấu trúc thư mục sạch sẽ, trực quan, dễ bảo trì và phân công công việc phát triển độc lập theo tính năng.
     *   *Nhược điểm:* Yêu cầu cập nhật thủ công hàng trăm dòng import và điều chỉnh các định cấu hình bảo mật/JPA scan trong dự án Spring Boot.
 
+### 11. Tuần Tự Hóa Dữ Liệu Thời Gian & Bảo Mật Redis Cache (Safe Jackson Polymorphic & JavaTime Serialization)
+*   **Vấn đề:** Khi sử dụng `@Cacheable` để cache dữ liệu của các danh mục trả về danh sách DTO phức tạp chứa ngày tháng (như trường `createdAt` kiểu `OffsetDateTime` trong `ProductResponse`), bộ tuần tự hóa mặc định `GenericJackson2JsonRedisSerializer` gặp phải các lỗi:
+    1. Không hỗ trợ mặc định kiểu dữ liệu thời gian của Java 8 (`OffsetDateTime`), gây ra lỗi giải tuần tự hóa.
+    2. Khi lấy danh sách `List<ProductResponse>` từ Redis, dữ liệu bị deserialize thành danh sách các `LinkedHashMap` thay vì kiểu `ProductResponse`, dẫn đến lỗi ép kiểu `ClassCastException` ở runtime.
+    3. Nếu mở quyền xác thực đối tượng tối đa bằng `allowIfBaseType(Object.class)`, hệ thống sẽ đối mặt với nguy cơ bảo mật nghiêm trọng liên quan đến lỗ hổng Java Deserialization RCE (Remote Code Execution).
+*   **Giải pháp:**
+    1. Đăng ký tường minh thư viện `jackson-datatype-jsr310` trong `pom.xml` để đảm bảo hỗ trợ đầy đủ API ngày tháng.
+    2. Tách cấu hình `ObjectMapper` riêng biệt cho Redis, đăng ký `JavaTimeModule` và tắt `WRITE_DATES_AS_TIMESTAMPS` để định dạng thời gian dạng ISO-8601 String dễ đọc trong JSON.
+    3. Thiết lập bộ lọc dữ liệu an toàn `BasicPolymorphicTypeValidator`, chỉ cho phép phục hồi (deserialization) các lớp đối tượng nằm trong package an toàn bao gồm: DTO của hệ thống (`com._eleven.shop.dto.`), cấu trúc collection của Java (`java.util.`) và các kiểu thời gian (`java.time.`).
+    4. Gom cấu hình bật cache `@EnableCaching` trực tiếp vào `RedisConfig` để tối ưu quản lý, đồng thời cấu hình logging debug (`org.springframework.data.redis=DEBUG` và `org.springframework.cache=TRACE`) trong `application-dev.yml` để dễ dàng giám sát vết hoạt động.
+*   **Đánh đổi (Trade-off):**
+    *   *Ưu điểm:* Giải quyết triệt để lỗi ép kiểu khi cache danh sách generic chứa dữ liệu thời gian, đảm bảo an toàn tuyệt đối trước các lỗ hổng bảo mật deserialization.
+    *   *Nhược điểm:* Việc lưu kèm thông tin định danh lớp đối tượng (`@class`) làm phình kích thước JSON trong Redis một chút. Ngoài ra, việc whitelist yêu cầu nhà phát triển phải cập nhật cấu hình nếu bổ sung thêm các package chứa DTO cần cache mới.
+
 ---
 
 ---

@@ -74,18 +74,6 @@ public class AdminDashboardController {
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 
-    @GetMapping("/low-stock")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getLowStockProducts() {
-        List<ProductResponse> data = dashboardService.getLowStockProducts();
-        return ResponseEntity.ok(ApiResponse.success(data));
-    }
-
-    @GetMapping("/no-orders")
-    public ResponseEntity<ApiResponse<List<ProductResponse>>> getNoOrderProducts() {
-        List<ProductResponse> data = dashboardService.getNoOrderProducts30Days();
-        return ResponseEntity.ok(ApiResponse.success(data));
-    }
-
     @GetMapping("/user-stats")
     public ResponseEntity<ApiResponse<UserStatsResponse>> getUserStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime startDate,
