@@ -58,7 +58,7 @@ export const productService = {
       params: {
         page: params.page ?? 0,
         size: params.size ?? 12,
-        search: params.search || "",
+        name: params.search || "",
         categoryId: params.categoryId || "",
         minPrice: params.minPrice || "",
         maxPrice: params.maxPrice || "",

@@ -92,7 +92,7 @@ public class OrderControllerTests {
         OrderRequest request = OrderRequest.builder()
                 .recipientName("Recipient")
                 .recipientPhone("0987654321")
-                .deliveryAddress("Address")
+                .deliveryAddress("123 Main Street")
                 .build();
 
         OrderResponse response = OrderResponse.builder().id(10L).orderCode("ORD-10").build();
@@ -111,7 +111,7 @@ public class OrderControllerTests {
         OrderRequest request = OrderRequest.builder()
                 .recipientName("Recipient")
                 .recipientPhone("0987654321")
-                .deliveryAddress("Address")
+                .deliveryAddress("123 Main Street")
                 .build();
 
         Mockito.when(orderService.createOrder(eq(1L), any(OrderRequest.class)))
@@ -140,7 +140,7 @@ public class OrderControllerTests {
         OrderRequest request = OrderRequest.builder()
                 .recipientName("Recipient")
                 .recipientPhone("0987654321")
-                .deliveryAddress("Address")
+                .deliveryAddress("123 Main Street")
                 .build();
 
         Mockito.when(orderService.createOrder(eq(1L), any(OrderRequest.class)))
