@@ -346,7 +346,7 @@ Sau đó mở file `.env.prod` lên và điền các thông tin bảo mật th�
 ### Bước 3: Khởi chạy ứng dụng bằng Docker Compose
 Chạy lệnh duy nhất sau tại thư mục gốc để Docker tự động tải ảnh, build mã nguồn và khởi chạy toàn bộ 5 container (`backend`, `frontend`, `postgres`, `redis`, `nginx`):
 ```bash
-docker compose up --build -d
+docker compose --env-file .env.prod up -d
 ```
 Sau khi các container ở trạng thái `healthy`, bạn có thể truy cập local:
 *   Trang mua sắm khách hàng: `http://localhost:3000`
