@@ -43,11 +43,12 @@ const checkoutSchema = z.object({
   recipientPhone: z
     .string()
     .min(1, "Vui lòng điền đầy đủ thông tin: Số điện thoại")
-    .regex(/^[0-9]{9,11}$/, "Số điện thoại không hợp lệ (9–11 chữ số)"),
+    .regex(/^0[0-9]{9}$/, "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có đúng 10 chữ số)"),
   deliveryAddress: z
     .string()
     .min(1, "Vui lòng điền đầy đủ thông tin: Địa chỉ giao hàng")
-    .min(10, "Địa chỉ phải có ít nhất 10 ký tự"),
+    .min(10, "Địa chỉ phải có ít nhất 10 ký tự")
+    .max(500, "Địa chỉ tối đa 500 ký tự"),
   note: z.string().max(500, "Ghi chú tối đa 500 ký tự").optional(),
 });
 
