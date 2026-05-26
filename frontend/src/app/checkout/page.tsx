@@ -148,11 +148,11 @@ export default function CheckoutPage() {
       router.push("/login");
       return;
     }
-    if (isAuthenticated && items.length === 0) {
+    if (isAuthenticated && items.length === 0 && !mutation.isSuccess && !mutation.isPending) {
       toast.error("Giỏ hàng đang trống. Vui lòng thêm sản phẩm.");
       router.push("/cart");
     }
-  }, [isAuthenticated, items.length, router]);
+  }, [isAuthenticated, items.length, router, mutation.isSuccess, mutation.isPending]);
 
   // ── Submit ──
   const onSubmit = async (data: CheckoutFormData) => {
