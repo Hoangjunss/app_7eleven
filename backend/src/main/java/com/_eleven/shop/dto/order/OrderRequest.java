@@ -19,11 +19,11 @@ public class OrderRequest {
     private String recipientName;
 
     @NotBlank(message = "Recipient phone is required")
-    @Pattern(regexp = "^0[0-9]{9}$", message = "Phone number must start with 0 and have exactly 10 digits")
+    @Pattern(regexp = "^[0-9]{9,11}$", message = "Invalid phone number format (9-11 digits)")
     private String recipientPhone;
 
     @NotBlank(message = "Delivery address is required")
-    @Size(min = 10, max = 500, message = "Delivery address must be between 10 and 500 characters")
+    @Size(max = 500, message = "Delivery address cannot exceed 500 characters")
     private String deliveryAddress;
 
     @Size(max = 500, message = "Note cannot exceed 500 characters")
